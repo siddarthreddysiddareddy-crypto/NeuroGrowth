@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 
 export default function Navbar() {
@@ -10,6 +10,15 @@ export default function Navbar() {
   const router = useRouter();
   const { user, isAuthenticated, logout } = useAuth();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [userRole, setUserRole] = useState<string | null>(null);
+
+  // Get user role from localStorage
+  useEffect(() => {
+    if (typeof window !== "undefined" && isAuthenticated) {
+      const storedRole = localStorage.getItem("userRole");
+      setUserRole(storedRole);
+    }
+  }, [isAuthenticated]);
 
   // Hide navbar on auth pages
   if (pathname.startsWith("/auth/")) {
@@ -20,6 +29,13 @@ export default function Navbar() {
     logout();
     router.push("/");
     setIsProfileOpen(false);
+  };
+
+  // Get dashboard link based on user role
+  const getDashboardLink = () => {
+    if (userRole === "business") return "/dashboard/business";
+    if (userRole === "investor") return "/dashboard/investor";
+    return "/dashboard/business"; // fallback
   };
 
   return (
@@ -65,27 +81,18 @@ export default function Navbar() {
               </Link>
             )}
 
-            {/* Dashboards Dropdown */}
-            {isAuthenticated && (
-              <div className="relative group">
-                <button className="px-3 py-2 text-gray-300 hover:text-white transition-colors">
-                  Dashboards ▼
-                </button>
-                <div className="absolute left-0 mt-0 w-48 bg-primary-light border border-primary-light/50 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all p-2 space-y-1 z-50">
-                  <Link
-                    href="/dashboard/business"
-                    className="block px-4 py-2 text-gray-300 hover:text-blue-400 hover:bg-primary/50 rounded transition-colors"
-                  >
-                    Business Dashboard
-                  </Link>
-                  <Link
-                    href="/dashboard/investor"
-                    className="block px-4 py-2 text-gray-300 hover:text-green-400 hover:bg-primary/50 rounded transition-colors"
-                  >
-                    Investor Dashboard
-                  </Link>
-                </div>
-              </div>
+            {/* Dashboard Link (Role-based) */}
+            {isAuthenticated && userRole && (
+              <Link
+                href={getDashboardLink()}
+                className={`transition-colors ${
+                  pathname === getDashboardLink()
+                    ? "text-blue-400"
+                    : "text-gray-300 hover:text-white"
+                }`}
+              >
+                Dashboard
+              </Link>
             )}
 
             {/* Profile Section or Login */}
@@ -107,8 +114,8 @@ export default function Navbar() {
 
                 {/* Profile Dropdown */}
                 {isProfileOpen && (
-                  <div className="absolute right-0 mt-2 w-56 bg-gray-800 border border-gray-700/50 rounded-lg shadow-xl opacity-100 visible transition-all p-3 space-y-2 z-50">
-                    <div className="px-4 py-3 border-b border-gray-700/50 mb-2">
+                  <div className="absolute right-0 mt-2 w-56 bg-[#0B1F3A]/80 backdrop-blur-md border border-white/20 rounded-lg shadow-xl opacity-100 visible transition-all p-3 space-y-2 z-50">
+                    <div className="px-4 py-3 border-b border-white/10 mb-2">
                       <p className="text-white font-semibold text-sm">
                         {user?.name}
                       </p>

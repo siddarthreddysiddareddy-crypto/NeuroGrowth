@@ -1,256 +1,278 @@
 "use client";
 
+import { useAuth } from "@/contexts/AuthContext";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import Card from "@/components/Card";
-import Link from "next/link";
-import { formatCurrencyINR, formatCompactCurrencyINR } from "@/utils/formatting";
-
-// Mock Data for Business Dashboard
-const weeklyContentPlan = [
-  { day: "Monday", content: "Announce new product feature", status: "published" },
-  { day: "Tuesday", content: "Share customer success story", status: "draft" },
-  { day: "Wednesday", content: "Behind-the-scenes team video", status: "scheduled" },
-  { day: "Thursday", content: "Tips & tricks blog post", status: "draft" },
-  { day: "Friday", content: "Weekly roundup newsletter", status: "draft" },
-  { day: "Saturday", content: "Community engagement post", status: "scheduled" },
-  { day: "Sunday", content: "Upcoming events announcement", status: "draft" },
-];
-
-const aiCaptions = [
-  {
-    title: "Caption Variation 1",
-    text: "🚀 Just launched our newest feature! Watch how it transforms your workflow. #AI #Automation #GrowthHacking",
-  },
-  {
-    title: "Caption Variation 2",
-    text:
-      "Excited to share how our customers are scaling faster than ever before. See real results in real time. 📊✨",
-  },
-  {
-    title: "Caption Variation 3",
-    text:
-      "Your business deserves to grow on autopilot. Discover the platform that powers growth for 1000+ companies.",
-  },
-];
-
-const campaignMetrics = [
-  { label: "Click-Through Rate", value: "8.4%", icon: "📍", trend: "+2.3%" },
-  { label: "Engagement Rate", value: "12.7%", icon: "💬", trend: "+4.1%" },
-  { label: "Reach", value: "24.5K", icon: "👥", trend: "+18%" },
-  { label: "Conversions", value: "342", icon: "✅", trend: "+12%" },
-];
-
-const activeCampaigns = [
-  { name: "Spring Sale 2024", status: "Active", progress: 75, roiNum: 1542000, roiDisplay: "₹15,42,000" },
-  { name: "Q2 Product Launch", status: "Planning", progress: 40, roiDisplay: "TBD" },
-  { name: "Email Nurture Sequence", status: "Active", progress: 60, roiNum: 895000, roiDisplay: "₹8,95,000" },
-];
+import ChatBox from "@/components/ChatBox";
+import Button from "@/components/Button";
 
 export default function BusinessDashboard() {
+  const { isAuthenticated, user } = useAuth();
+  const router = useRouter();
+
+  // Redirect if not authenticated
+  useEffect(() => {
+    if (!isAuthenticated) {
+      router.push("/");
+    }
+  }, [isAuthenticated, router]);
+
+  if (!isAuthenticated) {
+    return null;
+  }
+
+  const overviewMetrics = [
+    {
+      title: "Total Equity Sold",
+      value: "₹25,50,000",
+      change: "+12.5%",
+      icon: "📊",
+    },
+    {
+      title: "Amount Raised",
+      value: "₹1,02,00,000",
+      change: "+8.2%",
+      icon: "💰",
+    },
+    {
+      title: "Campaign ROI",
+      value: "342%",
+      change: "+24.3%",
+      icon: "📈",
+    },
+    {
+      title: "Conversions",
+      value: "1,245",
+      change: "+15.8%",
+      icon: "✅",
+    },
+  ];
+
+  const chartData = [
+    { month: "Jan", value: 45000 },
+    { month: "Feb", value: 52000 },
+    { month: "Mar", value: 48000 },
+    { month: "Apr", value: 61000 },
+    { month: "May", value: 55000 },
+    { month: "Jun", value: 67000 },
+  ];
+
+  const maxValue = Math.max(...chartData.map((d) => d.value));
+
+  const recentCampaigns = [
+    {
+      name: "Summer Sale 2025",
+      status: "Active",
+      progress: 75,
+      roi: "₹5,25,000",
+      conversion: "12.4%",
+    },
+    {
+      name: "Product Launch - Q2",
+      status: "Active",
+      progress: 58,
+      roi: "₹3,10,000",
+      conversion: "8.7%",
+    },
+    {
+      name: "Email Marketing Campaign",
+      status: "Completed",
+      progress: 100,
+      roi: "₹2,48,000",
+      conversion: "6.2%",
+    },
+  ];
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary via-primary-light to-primary py-8 px-4">
-      <div className="max-w-7xl mx-auto">
-        {/* Dashboard Header */}
-        <div className="mb-12">
-          <div className="flex items-center justify-between mb-4">
+    <div className="min-h-screen bg-gradient-to-br from-[#0B1F3A] via-[#0E2650] to-[#0B1F3A]">
+      {/* Header */}
+      <div className="bg-white/10 backdrop-blur-lg border-b border-white/20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-4xl md:text-5xl font-bold text-white mb-2">
+              <h1 className="text-4xl font-bold text-white mb-2">
                 Business Dashboard
               </h1>
-              <p className="text-gray-300 text-lg">
-                Marketing automation, analytics, and growth tools
+              <p className="text-gray-300">
+                Welcome back, {user?.name}! Here&apos;s your growth metrics overview.
               </p>
             </div>
-            <Link href="/" className="btn-secondary text-sm">
-              ← Back to Home
-            </Link>
+            <div className="flex gap-4">
+              <Button variant="outline" size="md">
+                📊 Download Report
+              </Button>
+            </div>
           </div>
         </div>
+      </div>
 
-        {/* Metrics Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {campaignMetrics.map((metric, i) => (
-            <Card key={i} className="text-center">
-              <div className="text-4xl mb-3">{metric.icon}</div>
-              <h3 className="text-gray-400 text-sm mb-2">{metric.label}</h3>
-              <div className="flex items-baseline justify-center gap-2">
-                <p className="text-3xl font-bold text-white">{metric.value}</p>
-                <span className="text-green-400 text-sm font-semibold">
-                  {metric.trend}
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Overview Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+          {overviewMetrics.map((metric, idx) => (
+            <Card key={idx} className="bg-white/10 backdrop-blur-lg border border-white/20 hover:bg-white/20 transition-all">
+              <div className="flex items-start justify-between mb-4">
+                <div>
+                  <p className="text-gray-300 text-sm font-medium">
+                    {metric.title}
+                  </p>
+                  <h3 className="text-2xl font-bold text-white mt-2">
+                    {metric.value}
+                  </h3>
+                </div>
+                <span className="text-2xl">{metric.icon}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-green-400 font-semibold text-sm">
+                  {metric.change}
                 </span>
+                <span className="text-gray-400 text-sm">this month</span>
               </div>
             </Card>
           ))}
         </div>
 
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-          {/* Weekly Content Plan */}
+        {/* Charts and Analytics */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 mb-12">
+          {/* Chart */}
           <div className="lg:col-span-2">
-            <Card title="📅 Weekly Content Plan">
-              <div className="space-y-3">
-                {weeklyContentPlan.map((item, i) => (
+            <Card className="h-full bg-white/10 backdrop-blur-lg border border-white/20">
+              <h3 className="text-xl font-bold text-white mb-6">
+                Revenue Trend (Last 6 Months)
+              </h3>
+              <div className="h-64 flex items-flex-end justify-around gap-4">
+                {chartData.map((data, idx) => (
                   <div
-                    key={i}
-                    className="flex items-start gap-4 p-3 bg-primary/30 rounded-lg hover:bg-primary/50 transition-colors group cursor-pointer"
+                    key={idx}
+                    className="flex flex-col items-center gap-2 flex-1"
                   >
-                    <div className="flex items-center justify-center w-12 h-12 bg-blue-500/20 border border-blue-500/30 rounded-lg group-hover:bg-blue-500/30 transition-colors flex-shrink-0">
-                      <span className="text-lg font-bold text-blue-400">
-                        {i + 1}
-                      </span>
-                    </div>
-                    <div className="flex-1">
-                      <p className="font-semibold text-white">{item.day}</p>
-                      <p className="text-sm text-gray-400">{item.content}</p>
-                      <span
-                        className={`inline-block mt-2 text-xs px-2 py-1 rounded-full font-semibold ${
-                          item.status === "published"
-                            ? "bg-green-500/20 text-green-400"
-                            : item.status === "scheduled"
-                              ? "bg-blue-500/20 text-blue-400"
-                              : "bg-yellow-500/20 text-yellow-400"
-                        }`}
+                    <div className="w-full bg-blue-500/20 rounded-t-lg relative group">
+                      <div
+                        className="bg-gradient-to-t from-blue-500 to-blue-300 w-full rounded-t-lg transition-all hover:from-blue-600 hover:to-blue-400 cursor-pointer"
+                        style={{
+                          height: `${(data.value / maxValue) * 200}px`,
+                        }}
                       >
-                        {item.status}
-                      </span>
+                        <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-[#0B1F3A] text-white px-2 py-1 rounded text-xs whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">
+                          ₹{(data.value / 100000).toFixed(1)}L
+                        </div>
+                      </div>
                     </div>
+                    <span className="text-gray-300 text-xs font-medium">
+                      {data.month}
+                    </span>
                   </div>
                 ))}
               </div>
-
-              <button className="w-full mt-6 px-4 py-2 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/50 text-blue-300 rounded-lg transition-colors text-sm font-medium">
-                Generate Next Week's Plan
-              </button>
             </Card>
           </div>
 
-          {/* Campaign ROI */}
-          <div>
-            <Card title="💰 Campaign ROI">
+          {/* Quick Stats */}
+          <Card className="bg-white/10 backdrop-blur-lg border border-white/20">
+            <h3 className="text-xl font-bold text-white mb-6">
+              Quick Stats
+            </h3>
+            <div className="space-y-4">
+              <div className="p-4 bg-blue-500/20 rounded-lg border border-blue-400/30">
+                <p className="text-sm text-gray-300 mb-1">Avg. Daily Revenue</p>
+                <p className="text-2xl font-bold text-blue-300">₹3,40,000</p>
+              </div>
+              <div className="p-4 bg-green-500/20 rounded-lg border border-green-400/30">
+                <p className="text-sm text-gray-300 mb-1">
+                  Conversion Rate
+                </p>
+                <p className="text-2xl font-bold text-green-300">12.8%</p>
+              </div>
+              <div className="p-4 bg-purple-500/20 rounded-lg border border-purple-400/30">
+                <p className="text-sm text-gray-300 mb-1">Active Customers</p>
+                <p className="text-2xl font-bold text-purple-300">3,420</p>
+              </div>
+            </div>
+          </Card>
+        </div>
+
+        {/* Recent Campaigns */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 mb-12">
+          <div className="lg:col-span-2">
+            <Card className="bg-white/10 backdrop-blur-lg border border-white/20">
+              <h3 className="text-xl font-bold text-white mb-6">
+                Recent Campaigns
+              </h3>
               <div className="space-y-4">
-                {activeCampaigns.map((campaign, i) => (
-                  <div key={i}>
-                    <div className="flex justify-between items-center mb-2">
-                      <p className="font-medium text-white text-sm">
-                        {campaign.name}
-                      </p>
-                      <span
-                        className={`text-xs px-2 py-1 rounded-full font-semibold ${
-                          campaign.status === "Active"
-                            ? "bg-green-500/20 text-green-400"
-                            : "bg-yellow-500/20 text-yellow-400"
-                        }`}
-                      >
-                        {campaign.status}
-                      </span>
+                {recentCampaigns.map((campaign, idx) => (
+                  <div
+                    key={idx}
+                    className="p-4 border border-white/10 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
+                  >
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex-1">
+                        <h4 className="font-semibold text-white">
+                          {campaign.name}
+                        </h4>
+                        <p className="text-sm text-gray-300">
+                          Status:{" "}
+                          <span
+                            className={`font-medium ${
+                              campaign.status === "Active"
+                                ? "text-green-400"
+                                : "text-gray-400"
+                            }`}
+                          >
+                            {campaign.status}
+                          </span>
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-semibold text-white">
+                          {campaign.roi}
+                        </p>
+                        <p className="text-sm text-green-400">
+                          {campaign.conversion} conversion
+                        </p>
+                      </div>
                     </div>
-                    <div className="w-full bg-primary/40 rounded-full h-2 mb-2">
+                    <div className="w-full bg-white/10 rounded-full h-2">
                       <div
-                        className="bg-gradient-to-r from-blue-400 to-blue-600 h-2 rounded-full transition-all"
+                        className="bg-gradient-to-r from-blue-500 to-blue-300 h-2 rounded-full"
                         style={{ width: `${campaign.progress}%` }}
                       ></div>
                     </div>
-                    <div className="flex justify-between text-xs text-gray-400">
-                      <span>{campaign.progress}% complete</span>
-                      <span className="text-green-400 font-semibold">
-                        ROI: {campaign.roiDisplay}
-                      </span>
-                    </div>
+                    <p className="text-xs text-gray-400 mt-2">
+                      {campaign.progress}% complete
+                    </p>
                   </div>
                 ))}
               </div>
-
-              <button className="w-full mt-6 px-4 py-2 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/50 text-blue-300 rounded-lg transition-colors text-sm font-medium">
-                + New Campaign
-              </button>
             </Card>
           </div>
-        </div>
 
-        {/* AI Generated Captions */}
-        <Card title="✨ AI Generated Captions">
-          <div>
-            <p className="text-gray-400 text-sm mb-6">
-              Choose from these AI-generated caption variations for your next
-              post:
-            </p>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {aiCaptions.map((caption, i) => (
-                <div
-                  key={i}
-                  className="bg-primary/30 border border-blue-500/20 rounded-lg p-4 hover:bg-primary/50 hover:border-blue-500/40 transition-all group cursor-pointer"
-                >
-                  <p className="font-semibold text-blue-400 mb-3 text-sm">
-                    {caption.title}
-                  </p>
-                  <p className="text-gray-300 text-sm leading-relaxed mb-4">
-                    {caption.text}
-                  </p>
-                  <button className="w-full px-3 py-2 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/50 text-blue-300 rounded-lg transition-colors text-xs font-medium">
-                    Copy & Use
-                  </button>
-                </div>
-              ))}
-            </div>
-
-            <button className="w-full mt-6 px-4 py-3 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white rounded-lg transition-all font-semibold flex items-center justify-center gap-2">
-              🤖 Generate More Captions
-            </button>
-          </div>
-        </Card>
-
-        {/* Growth Tools Section */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
-          <Card title="🎯 Quick Actions">
+          {/* Actions */}
+          <Card className="bg-white/10 backdrop-blur-lg border border-white/20">
+            <h3 className="text-xl font-bold text-white mb-6">
+              Quick Actions
+            </h3>
             <div className="space-y-3">
-              <button className="w-full p-3 text-left bg-primary/30 hover:bg-primary/50 border border-blue-500/20 rounded-lg transition-colors text-blue-300 font-medium">
-                📊 View Detailed Analytics
-              </button>
-              <button className="w-full p-3 text-left bg-primary/30 hover:bg-primary/50 border border-blue-500/20 rounded-lg transition-colors text-blue-300 font-medium">
-                📱 Manage Social Accounts
-              </button>
-              <button className="w-full p-3 text-left bg-primary/30 hover:bg-primary/50 border border-blue-500/20 rounded-lg transition-colors text-blue-300 font-medium">
-                📧 Email Campaign Builder
-              </button>
-              <button className="w-full p-3 text-left bg-primary/30 hover:bg-primary/50 border border-blue-500/20 rounded-lg transition-colors text-blue-300 font-medium">
-                ⚙️ Automation Settings
-              </button>
-            </div>
-          </Card>
-
-          <Card title="📈 Growth Insights">
-            <div className="space-y-4">
-              <div className="p-4 bg-gradient-to-r from-green-500/10 to-green-400/10 border border-green-500/30 rounded-lg">
-                <p className="text-sm text-gray-300 mb-2">
-                  📈 Your engagement rate is up 18% this week
-                </p>
-                <p className="text-xs text-gray-400">
-                  Continue with video content to maintain momentum
-                </p>
-              </div>
-              <div className="p-4 bg-gradient-to-r from-blue-500/10 to-blue-400/10 border border-blue-500/30 rounded-lg">
-                <p className="text-sm text-gray-300 mb-2">
-                  💡 AI-Generated Insights Ready
-                </p>
-                <p className="text-xs text-gray-400">
-                  New growth recommendations based on your data
-                </p>
-              </div>
+              <Button variant="primary" size="md" className="w-full">
+                💎 Sell Tokens
+              </Button>
+              <Button variant="primary" size="md" className="w-full">
+                📢 Create Campaign
+              </Button>
+              <Button variant="secondary" size="md" className="w-full">
+                📊 View Analytics
+              </Button>
+              <Button variant="outline" size="md" className="w-full">
+                ⚙️ Settings
+              </Button>
             </div>
           </Card>
         </div>
 
-        {/* Bottom CTA */}
-        <div className="mt-8 bg-gradient-to-r from-blue-600/20 to-blue-500/20 border border-blue-500/30 rounded-2xl p-8 text-center">
-          <h2 className="text-2xl font-bold text-white mb-2">
-            Ready to Accelerate Your Growth?
-          </h2>
-          <p className="text-gray-300 mb-6">
-            Connect your marketing tools and let AI automate your campaigns 24/7
-          </p>
-          <button className="btn-primary">
-            Connect Your Tools →
-          </button>
+        {/* AI Chat */}
+        <div className="max-w-2xl">
+          <ChatBox title="Business Growth Assistant" placeholder="Ask me about your growth strategy..." />
         </div>
       </div>
     </div>

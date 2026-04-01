@@ -1,377 +1,331 @@
 "use client";
 
+import { useAuth } from "@/contexts/AuthContext";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import Card from "@/components/Card";
-import Link from "next/link";
-import { formatCurrencyINR, formatCompactCurrencyINR } from "@/utils/formatting";
-
-// Mock Data for Investor Dashboard
-const portfolioMetricsRaw = [
-  { label: "Total Invested", amount: 2500000, icon: "💰", trend: "+12%" },
-  { label: "Portfolio Value", amount: 3180000, icon: "📈", trend: "+30%" },
-  { label: "Active Investments", value: "12", icon: "🎯", trend: "+2" },
-  { label: "ROI Average", value: "28.4%", icon: "✨", trend: "+4.2%" },
-];
-
-// Mock Stock Data
-const stocks = [
-  { name: "NeuroTech Labs", growth: "+3.4%" },
-  { name: "Growthify", growth: "+2.1%" },
-  { name: "FinGrow Solutions", growth: "-1.2%" },
-  { name: "VyaparX", growth: "+4.0%" },
-  { name: "TrendHive", growth: "-0.6%" },
-];
-
-const dealPipeline = [
-  {
-    name: "TechStack AI",
-    stage: "Series A",
-    amountNum: 5000000,
-    amountDisplay: "₹50,00,000",
-    valuationNum: 50000000,
-    valuationDisplay: "₹5,00,00,000",
-    match: "92%",
-  },
-  {
-    name: "GreenFlow Solar",
-    stage: "Seed",
-    amountNum: 2500000,
-    amountDisplay: "₹25,00,000",
-    valuationNum: 20000000,
-    valuationDisplay: "₹2,00,00,000",
-    match: "87%",
-  },
-  {
-    name: "CloudSync solutions",
-    stage: "Series B",
-    amountNum: 12000000,
-    amountDisplay: "₹1,20,00,000",
-    valuationNum: 250000000,
-    valuationDisplay: "₹25,00,00,000",
-    match: "95%",
-  },
-  {
-    name: "FinanceAI Pro",
-    stage: "Series A",
-    amountNum: 7500000,
-    amountDisplay: "₹75,00,000",
-    valuationNum: 80000000,
-    valuationDisplay: "₹8,00,00,000",
-    match: "89%",
-  },
-];
-
-const portfolio = [
-  {
-    name: "DataViz Systems",
-    investedNum: 3000000,
-    investedDisplay: "₹30,00,000",
-    currentNum: 4500000,
-    currentDisplay: "₹45,00,000",
-    return: "+150%",
-    stage: "Growth",
-  },
-  {
-    name: "HealthTech Labs",
-    investedNum: 2000000,
-    investedDisplay: "₹20,00,000",
-    currentNum: 5200000,
-    currentDisplay: "₹52,00,000",
-    return: "+260%",
-    stage: "On Track",
-  },
-  {
-    name: "EcoMove Logistics",
-    investedNum: 4000000,
-    investedDisplay: "₹40,00,000",
-    currentNum: 4000000,
-    currentDisplay: "₹40,00,000",
-    return: "0%",
-    stage: "Early",
-  },
-  {
-    name: "CloudNine Storage",
-    investedNum: 2500000,
-    investedDisplay: "₹25,00,000",
-    currentNum: 6800000,
-    currentDisplay: "₹68,00,000",
-    return: "+172%",
-    stage: "Exit Prep",
-  },
-];
-
-const opportunities = [
-  {
-    title: "AI-Powered Healthcare",
-    description: "Telemedicine platform with AI diagnostics",
-    stage: "Seed",
-    amountRange: "₹30,00,000 - ₹50,00,000",
-    match: "94%",
-  },
-  {
-    title: "Sustainable Fashion Tech",
-    description: "Blockchain supply chain for ethical fashion",
-    stage: "Series A",
-    amountRange: "₹75,00,000 - ₹1,20,00,000",
-    match: "88%",
-  },
-  {
-    title: "Fintech for Emerging Markets",
-    description: "Payment solutions for underbanked populations",
-    stage: "Series B",
-    amountRange: "₹1,50,00,000 - ₹2,50,00,000",
-    match: "91%",
-  },
-];
+import ChatBox from "@/components/ChatBox";
+import Button from "@/components/Button";
 
 export default function InvestorDashboard() {
+  const { isAuthenticated, user } = useAuth();
+  const router = useRouter();
+
+  // Redirect if not authenticated
+  useEffect(() => {
+    if (!isAuthenticated) {
+      router.push("/");
+    }
+  }, [isAuthenticated, router]);
+
+  if (!isAuthenticated) {
+    return null;
+  }
+
+  const portfolioMetrics = [
+    {
+      title: "Total Invested",
+      value: "₹2,50,00,000",
+      change: "+12%",
+      icon: "💰",
+    },
+    {
+      title: "Portfolio Value",
+      value: "₹3,18,00,000",
+      change: "+30%",
+      icon: "📈",
+    },
+    {
+      title: "Active Investments",
+      value: "12",
+      change: "+2",
+      icon: "🎯",
+    },
+    {
+      title: "Average ROI",
+      value: "28.4%",
+      change: "+4.2%",
+      icon: "✨",
+    },
+  ];
+
+  const investmentOpportunities = [
+    {
+      name: "TechStack AI",
+      stage: "Series A",
+      riskLevel: "Low",
+      equityAvailable: "15%",
+      valuation: "₹5,00,00,000",
+      raiseAmount: "₹50,00,000",
+      description: "AI-powered analytics platform for enterprises",
+    },
+    {
+      name: "GreenFlow Solar",
+      stage: "Seed",
+      riskLevel: "Medium",
+      equityAvailable: "12%",
+      valuation: "₹2,00,00,000",
+      raiseAmount: "₹25,00,000",
+      description: "Renewable energy solutions provider",
+    },
+    {
+      name: "CloudSync Solutions",
+      stage: "Series B",
+      riskLevel: "Medium",
+      equityAvailable: "8%",
+      valuation: "₹25,00,00,000",
+      raiseAmount: "₹1,20,00,000",
+      description: "Cloud infrastructure and DevOps tools",
+    },
+  ];
+
+  const activePortfolio = [
+    {
+      name: "DataViz Systems",
+      invested: "₹30,00,000",
+      currentValue: "₹45,00,000",
+      return: "+50%",
+      stage: "Growth",
+    },
+    {
+      name: "HealthTech Labs",
+      invested: "₹20,00,000",
+      currentValue: "₹52,00,000",
+      return: "+160%",
+      stage: "Series C",
+    },
+    {
+      name: "EcoMove Logistics",
+      invested: "₹40,00,000",
+      currentValue: "₹40,00,000",
+      return: "0%",
+      stage: "Early",
+    },
+  ];
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary via-primary-light to-primary py-8 px-4">
-      <div className="max-w-7xl mx-auto">
-        {/* Dashboard Header */}
-        <div className="mb-12">
-          <div className="flex items-center justify-between mb-4">
+    <div className="min-h-screen bg-gradient-to-br from-[#0B1F3A] via-[#0E2650] to-[#0B1F3A]">
+      {/* Header */}
+      <div className="bg-white/10 backdrop-blur-lg border-b border-white/20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-4xl md:text-5xl font-bold text-white mb-2">
+              <h1 className="text-4xl font-bold text-white mb-2">
                 Investor Dashboard
               </h1>
-              <p className="text-gray-300 text-lg">
-                Portfolio tracking, deal pipeline, and investment analytics
+              <p className="text-gray-300">
+                Welcome back, {user?.name}! Manage your investment portfolio and find new opportunities.
               </p>
             </div>
-            <Link href="/" className="btn-secondary text-sm">
-              ← Back to Home
-            </Link>
+            <div className="flex gap-4">
+              <Button variant="outline" size="md">
+                📋 Portfolio Summary
+              </Button>
+            </div>
           </div>
         </div>
+      </div>
 
-        {/* Portfolio Metrics Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {portfolioMetricsRaw.map((metric, i) => (
-            <Card key={i} className="text-center">
-              <div className="text-4xl mb-3">{metric.icon}</div>
-              <h3 className="text-gray-400 text-sm mb-2">{metric.label}</h3>
-              <div className="flex items-baseline justify-center gap-2">
-                <p className="text-3xl font-bold text-white">
-                  {metric.amount ? formatCompactCurrencyINR(metric.amount) : metric.value}
-                </p>
-                <span className="text-green-400 text-sm font-semibold">
-                  {metric.trend}
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Portfolio Metrics */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+          {portfolioMetrics.map((metric, idx) => (
+            <Card key={idx} className="bg-white/10 backdrop-blur-lg border border-white/20 hover:bg-white/20 transition-all">
+              <div className="flex items-start justify-between mb-4">
+                <div>
+                  <p className="text-gray-300 text-sm font-medium">
+                    {metric.title}
+                  </p>
+                  <h3 className="text-2xl font-bold text-white mt-2">
+                    {metric.value}
+                  </h3>
+                </div>
+                <span className="text-2xl">{metric.icon}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-green-400 font-semibold text-sm">
+                  {metric.change}
                 </span>
+                <span className="text-gray-400 text-sm">this month</span>
               </div>
             </Card>
           ))}
         </div>
 
-        {/* Market Overview Section */}
-        <div className="mb-8">
-          <Card title="📊 Market Overview">
-            <p className="text-gray-400 text-sm mb-6">
-              Real-time market movements for promising startup ecosystem companies:
-            </p>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-              {stocks.map((stock, i) => {
-                const isPositive = stock.growth.startsWith("+");
-                return (
-                  <div
-                    key={i}
-                    className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4 hover:scale-105 transition duration-300 cursor-pointer hover:bg-white/15"
-                  >
-                    <p className="font-semibold text-white mb-2 text-sm">
-                      {stock.name}
-                    </p>
-                    <div
-                      className={`text-2xl font-bold ${
-                        isPositive ? "text-green-400" : "text-red-400"
-                      }`}
-                    >
-                      {stock.growth}
-                    </div>
-                    <p className="text-xs text-gray-400 mt-2">
-                      {isPositive ? "📈 Bullish" : "📉 Bearish"}
-                    </p>
-                  </div>
-                );
-              })}
-            </div>
-          </Card>
-        </div>
-
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-          {/* Deal Pipeline */}
+        {/* Investment Opportunities & Active Investments */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 mb-12">
+          {/* Investment Opportunities */}
           <div className="lg:col-span-2">
-            <Card title="🎯 Deal Pipeline">
-              <div className="space-y-3">
-                {dealPipeline.map((deal, i) => (
+            <Card>
+              <h3 className="text-xl font-bold text-white mb-6">
+                Investment Opportunities
+              </h3>
+              <div className="space-y-4">
+                {investmentOpportunities.map((opportunity, idx) => (
                   <div
-                    key={i}
-                    className="p-4 bg-primary/30 rounded-lg hover:bg-primary/50 transition-colors group cursor-pointer border border-primary-light/20"
+                    key={idx}
+                    className="p-4 border border-white/10 rounded-lg bg-white/5 hover:border-green-400/30 hover:bg-green-500/10 transition-colors"
                   >
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex-1">
-                        <p className="font-semibold text-white text-lg">
-                          {deal.name}
+                        <div className="flex items-center gap-2 mb-1">
+                          <h4 className="font-semibold text-white">
+                            {opportunity.name}
+                          </h4>
+                          <span className="text-xs px-2 py-1 bg-blue-500/30 text-blue-300 rounded-full font-medium">
+                            {opportunity.stage}
+                          </span>
+                        </div>
+                        <p className="text-sm text-gray-300 mb-2">
+                          {opportunity.description}
                         </p>
-                        <div className="flex gap-4 flex-wrap mt-2">
-                          <span className="text-xs px-2 py-1 bg-blue-500/20 text-blue-300 rounded-full font-medium">
-                            {deal.stage}
-                          </span>
-                          <span className="text-xs px-2 py-1 bg-green-500/20 text-green-300 rounded-full font-medium">
-                            Raise: {deal.amountDisplay}
-                          </span>
+                        <div className="grid grid-cols-2 gap-3 text-sm">
+                          <div>
+                            <p className="text-gray-400">Equity Available</p>
+                            <p className="font-semibold text-white">
+                              {opportunity.equityAvailable}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-gray-400">Valuation</p>
+                            <p className="font-semibold text-white">
+                              {opportunity.valuation}
+                            </p>
+                          </div>
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="text-sm text-gray-400">Match Score</p>
-                        <p className="text-2xl font-bold text-green-400">
-                          {deal.match}
+                        <p className="text-xs text-gray-400 mb-1">Risk Level</p>
+                        <p
+                          className={`font-semibold text-sm ${
+                            opportunity.riskLevel === "Low"
+                              ? "text-green-400"
+                              : "text-yellow-400"
+                          }`}
+                        >
+                          {opportunity.riskLevel}
                         </p>
                       </div>
                     </div>
-                    <div className="w-full bg-primary/40 rounded-full h-2">
-                      <div
-                        className="bg-gradient-to-r from-green-400 to-green-600 h-2 rounded-full transition-all"
-                        style={{ width: deal.match }}
-                      ></div>
+                    <div className="flex items-center justify-between pt-3 border-t border-white/10">
+                      <p className="text-sm font-medium text-gray-300">
+                        Raising: {opportunity.raiseAmount}
+                      </p>
+                      <Button variant="primary" size="sm">
+                        Invest Now
+                      </Button>
                     </div>
-                    <p className="text-xs text-gray-500 mt-2">
-                      Valuation: {deal.valuationDisplay}
-                    </p>
                   </div>
                 ))}
               </div>
-
-              <button className="w-full mt-6 px-4 py-2 bg-green-500/20 hover:bg-green-500/30 border border-green-500/50 text-green-300 rounded-lg transition-colors text-sm font-medium">
-                View All Opportunities
-              </button>
             </Card>
           </div>
 
-          {/* Active Portfolio Summary */}
-          <div>
-            <Card title="📊 Portfolio Summary">
-              <div className="space-y-3">
-                {portfolio.slice(0, 3).map((investment, i) => (
-                  <div
-                    key={i}
-                    className="p-3 bg-primary/30 border border-primary-light/20 rounded-lg hover:bg-primary/50 transition-colors"
-                  >
-                    <p className="font-medium text-white text-sm mb-1">
-                      {investment.name}
-                    </p>
-                    <div className="flex justify-between text-xs text-gray-400 mb-2">
-                      <span>{investment.investedDisplay}</span>
-                      <span className="text-green-400 font-semibold">
-                        {investment.return}
-                      </span>
-                    </div>
-                    <p className="text-xs px-2 py-1 bg-blue-500/20 text-blue-300 rounded-full inline-block">
-                      {investment.stage}
-                    </p>
-                  </div>
-                ))}
-              </div>
-
-              <button className="w-full mt-6 px-4 py-2 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/50 text-blue-300 rounded-lg transition-colors text-sm font-medium">
-                View Full Portfolio
-              </button>
-            </Card>
-          </div>
-        </div>
-
-        {/* Recommended Opportunities */}
-        <Card title="✨ AI-Recommended Opportunities">
-          <div>
-            <p className="text-gray-400 text-sm mb-6">
-              Personalized investment opportunities matched to your profile:
-            </p>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {opportunities.map((opp, i) => (
-                <div
-                  key={i}
-                  className="bg-primary/30 border border-green-500/20 rounded-lg p-4 hover:bg-primary/50 hover:border-green-500/40 transition-all group cursor-pointer"
-                >
-                  <p className="font-semibold text-green-400 mb-2 text-sm">
-                    {opp.title}
-                  </p>
-                  <p className="text-gray-300 text-sm leading-relaxed mb-4">
-                    {opp.description}
-                  </p>
-                  <div className="space-y-2 text-xs mb-4">
-                    <div className="flex justify-between text-gray-400">
-                      <span>Stage: {opp.stage}</span>
-                      <span className="text-green-400 font-semibold">
-                        {opp.match}% match
-                      </span>
-                    </div>
-                    <p className="text-blue-300 font-medium">Seeking: {opp.amountRange}</p>
-                  </div>
-                  <button className="w-full px-3 py-2 bg-green-500/20 hover:bg-green-500/30 border border-green-500/50 text-green-300 rounded-lg transition-colors text-xs font-medium">
-                    View Full Details
-                  </button>
-                </div>
-              ))}
-            </div>
-
-            <button className="w-full mt-6 px-4 py-3 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white rounded-lg transition-all font-semibold flex items-center justify-center gap-2">
-              🔍 Browse All Deals
-            </button>
-          </div>
-        </Card>
-
-        {/* Investment Tools Section */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
-          <Card title="🛠️ Investor Tools">
+          {/* Market Overview */}
+          <Card>
+            <h3 className="text-xl font-bold text-white mb-6">
+              Market Overview
+            </h3>
             <div className="space-y-3">
-              <button className="w-full p-3 text-left bg-primary/30 hover:bg-primary/50 border border-green-500/20 rounded-lg transition-colors text-green-300 font-medium">
-                📋 Investment Agreement Templates
-              </button>
-              <button className="w-full p-3 text-left bg-primary/30 hover:bg-primary/50 border border-green-500/20 rounded-lg transition-colors text-green-300 font-medium">
-                📊 Portfolio Analytics & Reports
-              </button>
-              <button className="w-full p-3 text-left bg-primary/30 hover:bg-primary/50 border border-green-500/20 rounded-lg transition-colors text-green-300 font-medium">
-                💬 Direct Founder Access
-              </button>
-              <button className="w-full p-3 text-left bg-primary/30 hover:bg-primary/50 border border-green-500/20 rounded-lg transition-colors text-green-300 font-medium">
-                📈 Performance Benchmarking
-              </button>
-            </div>
-          </Card>
-
-          <Card title="📢 Market Intelligence">
-            <div className="space-y-4">
-              <div className="p-4 bg-gradient-to-r from-green-500/10 to-green-400/10 border border-green-500/30 rounded-lg">
-                <p className="text-sm text-gray-300 mb-2">
-                  🔥 Hot Sector: AI in Healthcare
+              <div className="p-3 bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 rounded-lg">
+                <p className="text-sm text-blue-900 font-medium">
+                  📈 Top Performing Sector
                 </p>
-                <p className="text-xs text-gray-400">
-                  3 new high-quality deals matching your criteria this week
+                <p className="text-xs text-blue-700 mt-1">
+                  AI & Machine Learning up 34% this quarter
                 </p>
               </div>
-              <div className="p-4 bg-gradient-to-r from-blue-500/10 to-blue-400/10 border border-blue-500/30 rounded-lg">
-                <p className="text-sm text-gray-300 mb-2">
-                  💡 Exit Alert: Portfolio Company
+              <div className="p-3 bg-gradient-to-r from-green-50 to-green-100 border border-green-200 rounded-lg">
+                <p className="text-sm text-green-900 font-medium">
+                  🚀 Emerging Opportunity
                 </p>
-                <p className="text-xs text-gray-400">
-                  DataViz Systems received acquisition offer at 3.5x valuation
+                <p className="text-xs text-green-700 mt-1">
+                  Green tech startups attracting major fund flows
+                </p>
+              </div>
+              <div className="p-3 bg-gradient-to-r from-purple-50 to-purple-100 border border-purple-200 rounded-lg">
+                <p className="text-sm text-purple-900 font-medium">
+                  💡 Market Trend
+                </p>
+                <p className="text-xs text-purple-700 mt-1">
+                  Series A fundraising at 3-year high
                 </p>
               </div>
             </div>
           </Card>
         </div>
 
-        {/* Bottom CTA */}
-        <div className="mt-8 bg-gradient-to-r from-green-600/20 to-green-500/20 border border-green-500/30 rounded-2xl p-8 text-center">
-          <h2 className="text-2xl font-bold text-white mb-2">
-            Connect with More Investment Opportunities
-          </h2>
-          <p className="text-gray-300 mb-6">
-            Access our full deal flow and grow your investment portfolio
-          </p>
-          <button className="inline-block px-8 py-4 bg-green-500 hover:bg-green-600 text-white rounded-xl font-semibold transition-all hover:scale-105">
-            Explore Investment Network →
-          </button>
+        {/* Active Portfolio */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 mb-12">
+          <div className="lg:col-span-2">
+            <Card>
+              <h3 className="text-xl font-bold text-white mb-6\">
+                Active Portfolio (3 of 12)
+              </h3>
+              <div className="space-y-4">
+                {activePortfolio.map((investment, idx) => (
+                  <div
+                    key={idx}
+                    className="p-4 border border-white/10 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex-1">
+                        <h4 className="font-semibold text-white">
+                          {investment.name}
+                        </h4>
+                        <span
+                          className={`inline-block text-xs px-2 py-1 rounded-full font-medium ${
+                            investment.stage === "Growth"
+                              ? "bg-green-500/30 text-green-300"
+                              : investment.stage === "Series C"
+                                ? "bg-blue-500/30 text-blue-300"
+                                : "bg-yellow-500/30 text-yellow-300"
+                          }`}
+                        >
+                          {investment.stage}
+                        </span>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-semibold text-white">
+                          {investment.return}
+                        </p>
+                        <p className="text-xs text-gray-400">
+                          {investment.invested} → {investment.currentValue}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          </div>
+
+          {/* Quick Actions */}
+          <Card>
+            <h3 className="text-xl font-bold text-white mb-6">
+              Quick Actions
+            </h3>
+            <div className="space-y-3">
+              <Button variant="primary" size="md" className="w-full">
+                🔍 Browse Deals
+              </Button>
+              <Button variant="primary" size="md" className="w-full">
+                💼 My Investments
+              </Button>
+              <Button variant="secondary" size="md" className="w-full">
+                📊 View Analytics
+              </Button>
+              <Button variant="outline" size="md" className="w-full">
+                ⚙️ Preferences
+              </Button>
+            </div>
+          </Card>
+        </div>
+
+        {/* AI Chat */}
+        <div className="max-w-2xl">
+          <ChatBox title="Investment Advisor" placeholder="Ask me about investment opportunities..." />
         </div>
       </div>
     </div>

@@ -73,11 +73,11 @@ export default function ChatBox({ title = "AI Assistant", placeholder = "Ask me 
   };
 
   return (
-    <div className="flex flex-col h-full bg-white rounded-2xl shadow-soft border border-gray-200">
+    <div className="flex flex-col h-full bg-white/10 backdrop-blur-lg rounded-2xl shadow-lg border border-white/20">
       {/* Header */}
-      <div className="px-6 py-4 border-b border-gray-200">
-        <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
-        <p className="text-sm text-gray-500">Get AI-powered insights</p>
+      <div className="px-6 py-4 border-b border-white/10">
+        <h3 className="text-lg font-semibold text-white">{title}</h3>
+        <p className="text-sm text-gray-300">Get AI-powered insights</p>
       </div>
 
       {/* Messages */}
@@ -91,7 +91,7 @@ export default function ChatBox({ title = "AI Assistant", placeholder = "Ask me 
               className={`max-w-xs px-4 py-2 rounded-lg ${
                 message.sender === "user"
                   ? "bg-blue-600 text-white rounded-br-none"
-                  : "bg-gray-100 text-gray-900 rounded-bl-none"
+                  : "bg-white/10 text-white rounded-bl-none"
               }`}
             >
               <p className="text-sm">{message.text}</p>
@@ -100,11 +100,11 @@ export default function ChatBox({ title = "AI Assistant", placeholder = "Ask me 
         ))}
         {isLoading && (
           <div className="flex justify-start">
-            <div className="bg-gray-100 px-4 py-2 rounded-lg rounded-bl-none">
+            <div className="bg-white/10 px-4 py-2 rounded-lg rounded-bl-none border border-white/10">
               <div className="flex gap-1">
-                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
-                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0.1s" }} />
-                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }} />
+                <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" />
+                <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: "0.1s" }} />
+                <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }} />
               </div>
             </div>
           </div>
@@ -121,7 +121,7 @@ export default function ChatBox({ title = "AI Assistant", placeholder = "Ask me 
             onKeyPress={handleKeyPress}
             placeholder={placeholder}
             disabled={isLoading}
-            className="flex-1 px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm disabled:bg-gray-50"
+            className="flex-1 px-4 py-2 border border-white/20 bg-white/10 text-white placeholder-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm disabled:bg-white/5"
           />
           <Button
             onClick={handleSendMessage}

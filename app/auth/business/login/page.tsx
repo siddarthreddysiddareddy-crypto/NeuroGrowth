@@ -52,7 +52,7 @@ export default function BusinessLogin() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center px-4 py-12">
+    <div className="min-h-screen bg-gradient-to-br from-[#0B1F3A] via-[#0E2650] to-[#0B1F3A] flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-8">
@@ -61,14 +61,14 @@ export default function BusinessLogin() {
               <span className="text-white font-bold">NG</span>
             </div>
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <h1 className="text-3xl font-bold text-white mb-2">
             Business Login
           </h1>
-          <p className="text-gray-600">Access your NeuroGrowth dashboard</p>
+          <p className="text-gray-300">Access your NeuroGrowth dashboard</p>
         </div>
 
         {/* Form Card */}
-        <div className="bg-white rounded-2xl shadow-soft p-8 border border-gray-200">
+        <div className="bg-white/10 backdrop-blur-lg rounded-2xl shadow-lg p-8 border border-white/20">
           <form onSubmit={handleSubmit} className="space-y-4">
             <Input
               label="Name"
@@ -112,7 +112,7 @@ export default function BusinessLogin() {
           </form>
 
           {/* Register Link */}
-          <p className="text-center mt-6 text-gray-600 text-sm">
+          <p className="text-center mt-6 text-gray-300 text-sm">
             New here?{" "}
             <Link
               href="/auth/business/register"
@@ -127,7 +127,7 @@ export default function BusinessLogin() {
         <p className="text-center mt-6">
           <Link
             href="/"
-            className="text-gray-600 hover:text-gray-900 text-sm font-medium"
+            className="text-gray-300 hover:text-white text-sm font-medium"
           >
             ← Back to Home
           </Link>

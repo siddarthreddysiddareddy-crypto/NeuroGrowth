@@ -18,7 +18,6 @@ const weeklyContentPlan = [
 ];
 
 const campaignMetrics = [
-  { label: "Click-Through Rate", value: "8.4%", icon: "📍", trend: "+2.3%" },
   { label: "Engagement Rate", value: "12.7%", icon: "💬", trend: "+4.1%" },
   { label: "Reach", value: "24.5K", icon: "👥", trend: "+18%" },
   { label: "Conversions", value: "342", icon: "✅", trend: "+12%" },
@@ -35,21 +34,60 @@ export default function BusinessDashboard() {
   const [recipient, setRecipient] = useState("");
   const [amount, setAmount] = useState("");
 
+  const displayBalance = balance ? parseFloat(balance).toLocaleString(undefined, { maximumFractionDigits: 2 }) : "0";
+
+  const handleSend = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (recipient && amount) {
+      await sendTokens(recipient, amount);
+      setRecipient("");
+      setAmount("");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0B1E3A] via-[#0E2650] to-[#0B1E3A] ml-64 pt-20">
       <div className="p-8">
         {/* Dashboard Header */}
-        <div className="mb-12">
-          <h1 className="text-4xl font-bold text-white mb-2">
-            Business Dashboard
-          </h1>
-          <p className="text-gray-300 text-lg">
-            Marketing automation, analytics, and growth tools
-          </p>
+        <div className="mb-12 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+          <div>
+            <h1 className="text-4xl font-bold text-white mb-2">
+              Business Dashboard
+            </h1>
+            <p className="text-gray-300 text-lg">
+              Marketing automation, analytics, and growth tools
+            </p>
+          </div>
+          {walletAddress && (
+            <div className="flex items-center gap-3 bg-blue-500/10 border border-blue-500/30 px-5 py-3 rounded-xl shadow-lg shadow-blue-500/5">
+              <div className="relative flex h-3 w-3">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+              </div>
+              <div className="flex flex-col">
+                <span className="text-xs text-gray-400 uppercase tracking-wider font-semibold">Connected Wallet</span>
+                <span className="text-blue-300 text-sm font-medium tracking-wide">
+                  {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}
+                </span>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Metrics Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          {/* Live Token Balance Card */}
+          <Card className="text-center relative overflow-hidden group">
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <div className="text-4xl mb-3">🪙</div>
+            <h3 className="text-gray-400 text-sm mb-2">NEURO Balance</h3>
+            <div className="flex items-baseline justify-center gap-2">
+              <p className="text-3xl font-bold text-white">
+                {displayBalance} <span className="text-lg text-blue-400">NGR</span>
+              </p>
+            </div>
+          </Card>
+
           {campaignMetrics.map((metric, i) => (
             <Card key={i} className="text-center">
               <div className="text-4xl mb-3">{metric.icon}</div>
@@ -181,8 +219,8 @@ export default function BusinessDashboard() {
           </Card>
         </div>
 
-        {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+        {/* Quick Actions & Transfer Tokens */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
           <Card title="🎯 Quick Actions">
             <div className="space-y-3">
               <button className="w-full p-3 text-left bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-colors text-blue-300 font-medium">
@@ -198,6 +236,47 @@ export default function BusinessDashboard() {
                 ⚙️ Automation Settings
               </button>
             </div>
+          </Card>
+
+          {/* Transfer Tokens Form */}
+          <Card title="💸 Transfer NEURO">
+            <form onSubmit={handleSend} className="space-y-4 pt-2">
+              <div>
+                <label className="block text-xs text-gray-400 mb-1 ml-1 uppercase font-semibold">Recipient Address</label>
+                <input
+                  type="text"
+                  placeholder="0x..."
+                  value={recipient}
+                  onChange={(e) => setRecipient(e.target.value)}
+                  className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-sm"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-gray-400 mb-1 ml-1 uppercase font-semibold">Amount (NGR)</label>
+                <input
+                  type="number"
+                  placeholder="0.0"
+                  step="0.01"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-sm"
+                  required
+                />
+              </div>
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white font-semibold rounded-lg py-3 transition-colors shadow-lg shadow-blue-500/20 disabled:opacity-50 disabled:cursor-not-allowed mt-2"
+              >
+                {loading ? "Processing..." : "Send Tokens"}
+              </button>
+              {status && (
+                <p className={`text-center text-xs mt-3 ${status.includes("Wait") ? "text-yellow-400 animate-pulse" : (status.includes("✅") ? "text-green-400" : (status.includes("❌") ? "text-red-400" : "text-blue-400"))}`}>
+                  {status}
+                </p>
+              )}
+            </form>
           </Card>
 
           <Card title="🚀 Growth Opportunities">

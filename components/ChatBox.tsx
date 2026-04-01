@@ -14,22 +14,23 @@ interface ChatBoxProps {
   title?: string;
   placeholder?: string;
   type?: "business" | "investor";
+  projectData?: any; // Add this line
 }
 
-const mockAIResponsesBusiness = [
-  "That's a great question! Here's what I recommend: Focus on building a strong product first, then worry about scaling.",
-  "Based on your metrics, you should consider optimizing your funnel. Try A/B testing your CTAs.",
-  "Your growth is impressive! I'd suggest exploring partnerships to accelerate further.",
-  "Have you tried implementing email automation? It could boost your conversions by 30-40%.",
-  "Your market timing is perfect. I recommend launching your next campaign soon.",
+const mockAIResponsesInvestor = [
+  "Based on the project data, this looks like a solid investment opportunity.",
+  "The current tokenomics are quite favorable.",
+  "I'd recommend looking closer at their roadmap.",
+  "The team has a strong track record.",
+  "This aligns with typical growth trajectories in this sector."
 ];
 
-const mockAIResponsesInvestor = [
-  "This MSME shows strong fundamentals with solid market traction. I'd rate it as a good investment opportunity.",
-  "Based on their financials, the risk level appears moderate to low. They have a clear path to profitability.",
-  "The market they're targeting is growing at 25% YoY. Great timing for investment.",
-  "Their team experience is exceptional. I recommend considering this deal seriously.",
-  "The valuation seems fair given their growth trajectory. This could yield strong returns.",
+const mockAIResponsesBusiness = [
+  "To attract more investors, consider refining your pitch deck.",
+  "Your current burn rate is sustainable for the next 12 months.",
+  "Have you considered expanding your target market?",
+  "This feature request seems highly demanded by your user base.",
+  "I can help you analyze the latest market trends."
 ];
 
 export default function ChatBox({ title = "AI Assistant", placeholder = "Ask me anything...", type = "business" }: ChatBoxProps) {
@@ -98,11 +99,10 @@ export default function ChatBox({ title = "AI Assistant", placeholder = "Ask me 
             className={`flex ${message.sender === "user" ? "justify-end" : "justify-start"}`}
           >
             <div
-              className={`max-w-xs px-4 py-2 rounded-lg ${
-                message.sender === "user"
+              className={`max-w-xs px-4 py-2 rounded-lg ${message.sender === "user"
                   ? "bg-blue-500/30 text-white rounded-br-none border border-blue-400/30"
                   : "bg-white/5 text-gray-100 rounded-bl-none border border-white/10"
-              }`}
+                }`}
             >
               <p className="text-sm">{message.text}</p>
             </div>

@@ -13,9 +13,10 @@ interface Message {
 interface ChatBoxProps {
   title?: string;
   placeholder?: string;
+  type?: "business" | "investor";
 }
 
-const mockAIResponses = [
+const mockAIResponsesBusiness = [
   "That's a great question! Here's what I recommend: Focus on building a strong product first, then worry about scaling.",
   "Based on your metrics, you should consider optimizing your funnel. Try A/B testing your CTAs.",
   "Your growth is impressive! I'd suggest exploring partnerships to accelerate further.",
@@ -23,7 +24,15 @@ const mockAIResponses = [
   "Your market timing is perfect. I recommend launching your next campaign soon.",
 ];
 
-export default function ChatBox({ title = "AI Assistant", placeholder = "Ask me anything..." }: ChatBoxProps) {
+const mockAIResponsesInvestor = [
+  "This MSME shows strong fundamentals with solid market traction. I'd rate it as a good investment opportunity.",
+  "Based on their financials, the risk level appears moderate to low. They have a clear path to profitability.",
+  "The market they're targeting is growing at 25% YoY. Great timing for investment.",
+  "Their team experience is exceptional. I recommend considering this deal seriously.",
+  "The valuation seems fair given their growth trajectory. This could yield strong returns.",
+];
+
+export default function ChatBox({ title = "AI Assistant", placeholder = "Ask me anything...", type = "business" }: ChatBoxProps) {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
@@ -52,8 +61,9 @@ export default function ChatBox({ title = "AI Assistant", placeholder = "Ask me 
 
     // Simulate AI response delay
     setTimeout(() => {
+      const responses = type === "investor" ? mockAIResponsesInvestor : mockAIResponsesBusiness;
       const randomResponse =
-        mockAIResponses[Math.floor(Math.random() * mockAIResponses.length)];
+        responses[Math.floor(Math.random() * responses.length)];
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
         text: randomResponse,
@@ -73,11 +83,11 @@ export default function ChatBox({ title = "AI Assistant", placeholder = "Ask me 
   };
 
   return (
-    <div className="flex flex-col h-full bg-white rounded-2xl shadow-soft border border-gray-200">
+    <div className="flex flex-col h-full bg-white/10 backdrop-blur-lg rounded-2xl shadow-lg border border-white/20">
       {/* Header */}
-      <div className="px-6 py-4 border-b border-gray-200">
-        <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
-        <p className="text-sm text-gray-500">Get AI-powered insights</p>
+      <div className="px-6 py-4 border-b border-white/10">
+        <h3 className="text-lg font-semibold text-white">{title}</h3>
+        <p className="text-sm text-gray-400">Get AI-powered insights</p>
       </div>
 
       {/* Messages */}
@@ -90,8 +100,8 @@ export default function ChatBox({ title = "AI Assistant", placeholder = "Ask me 
             <div
               className={`max-w-xs px-4 py-2 rounded-lg ${
                 message.sender === "user"
-                  ? "bg-blue-600 text-white rounded-br-none"
-                  : "bg-gray-100 text-gray-900 rounded-bl-none"
+                  ? "bg-blue-500/30 text-white rounded-br-none border border-blue-400/30"
+                  : "bg-white/5 text-gray-100 rounded-bl-none border border-white/10"
               }`}
             >
               <p className="text-sm">{message.text}</p>
@@ -100,11 +110,11 @@ export default function ChatBox({ title = "AI Assistant", placeholder = "Ask me 
         ))}
         {isLoading && (
           <div className="flex justify-start">
-            <div className="bg-gray-100 px-4 py-2 rounded-lg rounded-bl-none">
-              <div className="flex gap-1">
-                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
-                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0.1s" }} />
-                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }} />
+            <div className="bg-white/5 px-4 py-2 rounded-lg rounded-bl-none border border-white/10">
+              <div className="flex gap-2">
+                <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" />
+                <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: "0.1s" }} />
+                <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }} />
               </div>
             </div>
           </div>
@@ -112,7 +122,7 @@ export default function ChatBox({ title = "AI Assistant", placeholder = "Ask me 
       </div>
 
       {/* Input */}
-      <div className="p-6 border-t border-gray-200">
+      <div className="p-6 border-t border-white/10">
         <div className="flex gap-2">
           <input
             type="text"
@@ -121,7 +131,7 @@ export default function ChatBox({ title = "AI Assistant", placeholder = "Ask me 
             onKeyPress={handleKeyPress}
             placeholder={placeholder}
             disabled={isLoading}
-            className="flex-1 px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm disabled:bg-gray-50"
+            className="flex-1 px-4 py-2 border border-white/20 bg-white/5 text-white placeholder-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:bg-white/10 transition-all text-sm disabled:opacity-50"
           />
           <Button
             onClick={handleSendMessage}

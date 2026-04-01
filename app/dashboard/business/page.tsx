@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import Card from "@/components/Card";
-import Link from "next/link";
+import ChatBox from "@/components/ChatBox";
 import { formatCurrencyINR, formatCompactCurrencyINR } from "@/utils/formatting";
 import { useNeuroGrowth } from "../../../hooks/useNeuroGrowth";
+
 // Mock Data for Business Dashboard
 const weeklyContentPlan = [
   { day: "Monday", content: "Announce new product feature", status: "published" },
@@ -14,23 +15,6 @@ const weeklyContentPlan = [
   { day: "Friday", content: "Weekly roundup newsletter", status: "draft" },
   { day: "Saturday", content: "Community engagement post", status: "scheduled" },
   { day: "Sunday", content: "Upcoming events announcement", status: "draft" },
-];
-
-const aiCaptions = [
-  {
-    title: "Caption Variation 1",
-    text: "🚀 Just launched our newest feature! Watch how it transforms your workflow. #AI #Automation #GrowthHacking",
-  },
-  {
-    title: "Caption Variation 2",
-    text:
-      "Excited to share how our customers are scaling faster than ever before. See real results in real time. 📊✨",
-  },
-  {
-    title: "Caption Variation 3",
-    text:
-      "Your business deserves to grow on autopilot. Discover the platform that powers growth for 1000+ companies.",
-  },
 ];
 
 const campaignMetrics = [
@@ -50,24 +34,18 @@ export default function BusinessDashboard() {
   const { walletAddress, balance, status, loading, connectWallet, sendTokens } = useNeuroGrowth();
   const [recipient, setRecipient] = useState("");
   const [amount, setAmount] = useState("");
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary via-primary-light to-primary py-8 px-4">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-[#0B1E3A] via-[#0E2650] to-[#0B1E3A] ml-64 pt-20">
+      <div className="p-8">
         {/* Dashboard Header */}
         <div className="mb-12">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h1 className="text-4xl md:text-5xl font-bold text-white mb-2">
-                Business Dashboard
-              </h1>
-              <p className="text-gray-300 text-lg">
-                Marketing automation, analytics, and growth tools
-              </p>
-            </div>
-            <Link href="/" className="btn-secondary text-sm">
-              ← Back to Home
-            </Link>
-          </div>
+          <h1 className="text-4xl font-bold text-white mb-2">
+            Business Dashboard
+          </h1>
+          <p className="text-gray-300 text-lg">
+            Marketing automation, analytics, and growth tools
+          </p>
         </div>
 
         {/* Metrics Grid */}
@@ -95,7 +73,7 @@ export default function BusinessDashboard() {
                 {weeklyContentPlan.map((item, i) => (
                   <div
                     key={i}
-                    className="flex items-start gap-4 p-3 bg-primary/30 rounded-lg hover:bg-primary/50 transition-colors group cursor-pointer"
+                    className="flex items-start gap-4 p-3 bg-white/5 rounded-lg hover:bg-white/10 transition-colors group cursor-pointer border border-white/10"
                   >
                     <div className="flex items-center justify-center w-12 h-12 bg-blue-500/20 border border-blue-500/30 rounded-lg group-hover:bg-blue-500/30 transition-colors flex-shrink-0">
                       <span className="text-lg font-bold text-blue-400">
@@ -147,7 +125,7 @@ export default function BusinessDashboard() {
                         {campaign.status}
                       </span>
                     </div>
-                    <div className="w-full bg-primary/40 rounded-full h-2 mb-2">
+                    <div className="w-full bg-white/10 rounded-full h-2 mb-2">
                       <div
                         className="bg-gradient-to-r from-blue-400 to-blue-600 h-2 rounded-full transition-all"
                         style={{ width: `${campaign.progress}%` }}
@@ -170,57 +148,16 @@ export default function BusinessDashboard() {
           </div>
         </div>
 
-        {/* AI Generated Captions */}
-        <Card title="✨ AI Generated Captions">
-          <div>
-            <p className="text-gray-400 text-sm mb-6">
-              Choose from these AI-generated caption variations for your next
-              post:
-            </p>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {aiCaptions.map((caption, i) => (
-                <div
-                  key={i}
-                  className="bg-primary/30 border border-blue-500/20 rounded-lg p-4 hover:bg-primary/50 hover:border-blue-500/40 transition-all group cursor-pointer"
-                >
-                  <p className="font-semibold text-blue-400 mb-3 text-sm">
-                    {caption.title}
-                  </p>
-                  <p className="text-gray-300 text-sm leading-relaxed mb-4">
-                    {caption.text}
-                  </p>
-                  <button className="w-full px-3 py-2 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/50 text-blue-300 rounded-lg transition-colors text-xs font-medium">
-                    Copy & Use
-                  </button>
-                </div>
-              ))}
-            </div>
-
-            <button className="w-full mt-6 px-4 py-3 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white rounded-lg transition-all font-semibold flex items-center justify-center gap-2">
-              🤖 Generate More Captions
-            </button>
+        {/* AI Agent & Insights */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+          {/* AI Advisor */}
+          <div className="lg:col-span-2 h-96">
+            <ChatBox 
+              title="🤖 Business AI Advisor" 
+              placeholder="Ask about revenue, growth, equity..." 
+              type="business"
+            />
           </div>
-        </Card>
-
-        {/* Growth Tools Section */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
-          <Card title="🎯 Quick Actions">
-            <div className="space-y-3">
-              <button className="w-full p-3 text-left bg-primary/30 hover:bg-primary/50 border border-blue-500/20 rounded-lg transition-colors text-blue-300 font-medium">
-                📊 View Detailed Analytics
-              </button>
-              <button className="w-full p-3 text-left bg-primary/30 hover:bg-primary/50 border border-blue-500/20 rounded-lg transition-colors text-blue-300 font-medium">
-                📱 Manage Social Accounts
-              </button>
-              <button className="w-full p-3 text-left bg-primary/30 hover:bg-primary/50 border border-blue-500/20 rounded-lg transition-colors text-blue-300 font-medium">
-                📧 Email Campaign Builder
-              </button>
-              <button className="w-full p-3 text-left bg-primary/30 hover:bg-primary/50 border border-blue-500/20 rounded-lg transition-colors text-blue-300 font-medium">
-                ⚙️ Automation Settings
-              </button>
-            </div>
-          </Card>
 
           <Card title="📈 Growth Insights">
             <div className="space-y-4">
@@ -244,50 +181,55 @@ export default function BusinessDashboard() {
           </Card>
         </div>
 
+        {/* Quick Actions */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+          <Card title="🎯 Quick Actions">
+            <div className="space-y-3">
+              <button className="w-full p-3 text-left bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-colors text-blue-300 font-medium">
+                📊 View Detailed Analytics
+              </button>
+              <button className="w-full p-3 text-left bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-colors text-blue-300 font-medium">
+                📱 Manage Social Accounts
+              </button>
+              <button className="w-full p-3 text-left bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-colors text-blue-300 font-medium">
+                📧 Email Campaign Builder
+              </button>
+              <button className="w-full p-3 text-left bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-colors text-blue-300 font-medium">
+                ⚙️ Automation Settings
+              </button>
+            </div>
+          </Card>
+
+          <Card title="🚀 Growth Opportunities">
+            <div className="space-y-3">
+              <div className="p-3 bg-white/5 border border-white/10 rounded-lg">
+                <p className="text-sm font-semibold text-white">Partner Integration</p>
+                <p className="text-xs text-gray-400 mt-1">Connect with complementary services</p>
+              </div>
+              <div className="p-3 bg-white/5 border border-white/10 rounded-lg">
+                <p className="text-sm font-semibold text-white">Referral Program</p>
+                <p className="text-xs text-gray-400 mt-1">Earn commissions on new client referrals</p>
+              </div>
+              <div className="p-3 bg-white/5 border border-white/10 rounded-lg">
+                <p className="text-sm font-semibold text-white">Scale Module</p>
+                <p className="text-xs text-gray-400 mt-1">Advanced features for growth scaling</p>
+              </div>
+            </div>
+          </Card>
+        </div>
+
         {/* Bottom CTA */}
-        <div className="mt-8 bg-gradient-to-r from-blue-600/20 to-blue-500/20 border border-blue-500/30 rounded-2xl p-8 text-center">
+        <div className="bg-gradient-to-r from-blue-600/20 to-blue-500/20 border border-blue-500/30 rounded-2xl p-8 text-center">
           <h2 className="text-2xl font-bold text-white mb-2">
             Ready to Accelerate Your Growth?
           </h2>
           <p className="text-gray-300 mb-6">
             Connect your marketing tools and let AI automate your campaigns 24/7
           </p>
-          <button className="btn-primary">
+          <button className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors">
             Connect Your Tools →
           </button>
         </div>
-      </div>
-      {/* Add Blockchain Section */}
-      <div>
-        <h2>Send NGT Tokens</h2>
-
-        {!walletAddress ? (
-          <button onClick={connectWallet}>Connect Wallet</button>
-        ) : (
-          <>
-            <p>Connected: {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}</p>
-            <p>Balance: {balance} NGT</p>
-
-            <input
-              placeholder="Recipient Address"
-              value={recipient}
-              onChange={(e) => setRecipient(e.target.value)}
-            />
-            <input
-              placeholder="Amount"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-            />
-            <button
-              onClick={() => sendTokens(recipient, amount)}
-              disabled={loading}
-            >
-              {loading ? "Sending..." : "Send Tokens"}
-            </button>
-
-            <p>{status}</p>
-          </>
-        )}
       </div>
     </div>
   );

@@ -4,13 +4,14 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useNeuroGrowth } from "../hooks/useNeuroGrowth";
 
 export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
   const { user, isAuthenticated, logout } = useAuth();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-
+  const { walletAddress, connectWallet } = useNeuroGrowth();
   // Hide navbar on auth pages
   if (pathname.startsWith("/auth/")) {
     return null;
@@ -147,6 +148,12 @@ export default function Navbar() {
           </div>
         </div>
       </div>
+      {/* Add this button */}
+      <button onClick={connectWallet}>
+        {walletAddress
+          ? `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`
+          : "Connect Wallet"}
+      </button>
     </nav>
   );
 }

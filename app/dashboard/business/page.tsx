@@ -1,9 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import Card from "@/components/Card";
 import Link from "next/link";
 import { formatCurrencyINR, formatCompactCurrencyINR } from "@/utils/formatting";
-
+import { useNeuroGrowth } from "../../../hooks/useNeuroGrowth";
 // Mock Data for Business Dashboard
 const weeklyContentPlan = [
   { day: "Monday", content: "Announce new product feature", status: "published" },
@@ -46,6 +47,9 @@ const activeCampaigns = [
 ];
 
 export default function BusinessDashboard() {
+  const { walletAddress, balance, status, loading, connectWallet, sendTokens } = useNeuroGrowth();
+  const [recipient, setRecipient] = useState("");
+  const [amount, setAmount] = useState("");
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary via-primary-light to-primary py-8 px-4">
       <div className="max-w-7xl mx-auto">
@@ -252,6 +256,38 @@ export default function BusinessDashboard() {
             Connect Your Tools →
           </button>
         </div>
+      </div>
+      {/* Add Blockchain Section */}
+      <div>
+        <h2>Send NGT Tokens</h2>
+
+        {!walletAddress ? (
+          <button onClick={connectWallet}>Connect Wallet</button>
+        ) : (
+          <>
+            <p>Connected: {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}</p>
+            <p>Balance: {balance} NGT</p>
+
+            <input
+              placeholder="Recipient Address"
+              value={recipient}
+              onChange={(e) => setRecipient(e.target.value)}
+            />
+            <input
+              placeholder="Amount"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+            />
+            <button
+              onClick={() => sendTokens(recipient, amount)}
+              disabled={loading}
+            >
+              {loading ? "Sending..." : "Send Tokens"}
+            </button>
+
+            <p>{status}</p>
+          </>
+        )}
       </div>
     </div>
   );

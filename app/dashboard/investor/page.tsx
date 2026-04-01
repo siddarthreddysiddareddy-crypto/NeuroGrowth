@@ -3,7 +3,8 @@
 import Card from "@/components/Card";
 import Link from "next/link";
 import { formatCurrencyINR, formatCompactCurrencyINR } from "@/utils/formatting";
-
+import { useEffect } from "react";
+import { useNeuroGrowth } from "../../../hooks/useNeuroGrowth";
 // Mock Data for Investor Dashboard
 const portfolioMetricsRaw = [
   { label: "Total Invested", amount: 2500000, icon: "💰", trend: "+12%" },
@@ -124,6 +125,12 @@ const opportunities = [
 ];
 
 export default function InvestorDashboard() {
+  const { walletAddress, balance, connectWallet, fetchBalance } = useNeuroGrowth();
+
+  useEffect(() => {
+    if (walletAddress) fetchBalance(walletAddress);
+  }, [walletAddress]);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary via-primary-light to-primary py-8 px-4">
       <div className="max-w-7xl mx-auto">
@@ -180,9 +187,8 @@ export default function InvestorDashboard() {
                       {stock.name}
                     </p>
                     <div
-                      className={`text-2xl font-bold ${
-                        isPositive ? "text-green-400" : "text-red-400"
-                      }`}
+                      className={`text-2xl font-bold ${isPositive ? "text-green-400" : "text-red-400"
+                        }`}
                     >
                       {stock.growth}
                     </div>
@@ -374,6 +380,15 @@ export default function InvestorDashboard() {
           </button>
         </div>
       </div>
+      {/* Add Blockchain Section */}
+      {!walletAddress ? (
+        <button onClick={connectWallet}>Connect Wallet to View Balance</button>
+      ) : (
+        <div>
+          <p>Wallet: {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}</p>
+          <p>NGT Balance: {balance} NGT</p>
+        </div>
+      )}
     </div>
   );
 }

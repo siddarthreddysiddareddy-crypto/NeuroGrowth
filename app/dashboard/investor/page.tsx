@@ -1,10 +1,11 @@
 "use client";
 
 import Card from "@/components/Card";
-import Link from "next/link";
+import ChatBox from "@/components/ChatBox";
 import { formatCurrencyINR, formatCompactCurrencyINR } from "@/utils/formatting";
 import { useEffect } from "react";
 import { useNeuroGrowth } from "../../../hooks/useNeuroGrowth";
+
 // Mock Data for Investor Dashboard
 const portfolioMetricsRaw = [
   { label: "Total Invested", amount: 2500000, icon: "💰", trend: "+12%" },
@@ -50,15 +51,6 @@ const dealPipeline = [
     valuationDisplay: "₹25,00,00,000",
     match: "95%",
   },
-  {
-    name: "FinanceAI Pro",
-    stage: "Series A",
-    amountNum: 7500000,
-    amountDisplay: "₹75,00,000",
-    valuationNum: 80000000,
-    valuationDisplay: "₹8,00,00,000",
-    match: "89%",
-  },
 ];
 
 const portfolio = [
@@ -79,15 +71,6 @@ const portfolio = [
     currentDisplay: "₹52,00,000",
     return: "+260%",
     stage: "On Track",
-  },
-  {
-    name: "EcoMove Logistics",
-    investedNum: 4000000,
-    investedDisplay: "₹40,00,000",
-    currentNum: 4000000,
-    currentDisplay: "₹40,00,000",
-    return: "0%",
-    stage: "Early",
   },
   {
     name: "CloudNine Storage",
@@ -132,23 +115,16 @@ export default function InvestorDashboard() {
   }, [walletAddress]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary via-primary-light to-primary py-8 px-4">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-[#0B1E3A] via-[#0E2650] to-[#0B1E3A] ml-64 pt-20">
+      <div className="p-8">
         {/* Dashboard Header */}
         <div className="mb-12">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h1 className="text-4xl md:text-5xl font-bold text-white mb-2">
-                Investor Dashboard
-              </h1>
-              <p className="text-gray-300 text-lg">
-                Portfolio tracking, deal pipeline, and investment analytics
-              </p>
-            </div>
-            <Link href="/" className="btn-secondary text-sm">
-              ← Back to Home
-            </Link>
-          </div>
+          <h1 className="text-4xl font-bold text-white mb-2">
+            Investor Dashboard
+          </h1>
+          <p className="text-gray-300 text-lg">
+            Portfolio tracking, deal pipeline, and investment analytics
+          </p>
         </div>
 
         {/* Portfolio Metrics Grid */}
@@ -211,7 +187,7 @@ export default function InvestorDashboard() {
                 {dealPipeline.map((deal, i) => (
                   <div
                     key={i}
-                    className="p-4 bg-primary/30 rounded-lg hover:bg-primary/50 transition-colors group cursor-pointer border border-primary-light/20"
+                    className="p-4 bg-white/5 rounded-lg hover:bg-white/10 transition-colors group cursor-pointer border border-white/10"
                   >
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex-1">
@@ -234,7 +210,7 @@ export default function InvestorDashboard() {
                         </p>
                       </div>
                     </div>
-                    <div className="w-full bg-primary/40 rounded-full h-2">
+                    <div className="w-full bg-white/10 rounded-full h-2">
                       <div
                         className="bg-gradient-to-r from-green-400 to-green-600 h-2 rounded-full transition-all"
                         style={{ width: deal.match }}
@@ -260,7 +236,7 @@ export default function InvestorDashboard() {
                 {portfolio.slice(0, 3).map((investment, i) => (
                   <div
                     key={i}
-                    className="p-3 bg-primary/30 border border-primary-light/20 rounded-lg hover:bg-primary/50 transition-colors"
+                    className="p-3 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 transition-colors"
                   >
                     <p className="font-medium text-white text-sm mb-1">
                       {investment.name}
@@ -285,6 +261,39 @@ export default function InvestorDashboard() {
           </div>
         </div>
 
+        {/* AI Agent & Market Intelligence */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+          {/* AI Advisor */}
+          <div className="lg:col-span-2 h-96">
+            <ChatBox 
+              title="💰 Investor AI Advisor" 
+              placeholder="Ask about risks, returns, opportunities..." 
+              type="investor"
+            />
+          </div>
+
+          <Card title="📢 Market Intelligence">
+            <div className="space-y-4">
+              <div className="p-4 bg-gradient-to-r from-green-500/10 to-green-400/10 border border-green-500/30 rounded-lg">
+                <p className="text-sm text-gray-300 mb-2">
+                  🔥 Hot Sector: AI in Healthcare
+                </p>
+                <p className="text-xs text-gray-400">
+                  3 new high-quality deals matching your criteria this week
+                </p>
+              </div>
+              <div className="p-4 bg-gradient-to-r from-blue-500/10 to-blue-400/10 border border-blue-500/30 rounded-lg">
+                <p className="text-sm text-gray-300 mb-2">
+                  💡 Exit Alert: Portfolio Company
+                </p>
+                <p className="text-xs text-gray-400">
+                  DataViz Systems received acquisition offer at 3.5x valuation
+                </p>
+              </div>
+            </div>
+          </Card>
+        </div>
+
         {/* Recommended Opportunities */}
         <Card title="✨ AI-Recommended Opportunities">
           <div>
@@ -296,7 +305,7 @@ export default function InvestorDashboard() {
               {opportunities.map((opp, i) => (
                 <div
                   key={i}
-                  className="bg-primary/30 border border-green-500/20 rounded-lg p-4 hover:bg-primary/50 hover:border-green-500/40 transition-all group cursor-pointer"
+                  className="bg-white/5 border border-green-500/20 rounded-lg p-4 hover:bg-white/10 hover:border-green-500/40 transition-all group cursor-pointer"
                 >
                   <p className="font-semibold text-green-400 mb-2 text-sm">
                     {opp.title}
@@ -326,47 +335,6 @@ export default function InvestorDashboard() {
           </div>
         </Card>
 
-        {/* Investment Tools Section */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
-          <Card title="🛠️ Investor Tools">
-            <div className="space-y-3">
-              <button className="w-full p-3 text-left bg-primary/30 hover:bg-primary/50 border border-green-500/20 rounded-lg transition-colors text-green-300 font-medium">
-                📋 Investment Agreement Templates
-              </button>
-              <button className="w-full p-3 text-left bg-primary/30 hover:bg-primary/50 border border-green-500/20 rounded-lg transition-colors text-green-300 font-medium">
-                📊 Portfolio Analytics & Reports
-              </button>
-              <button className="w-full p-3 text-left bg-primary/30 hover:bg-primary/50 border border-green-500/20 rounded-lg transition-colors text-green-300 font-medium">
-                💬 Direct Founder Access
-              </button>
-              <button className="w-full p-3 text-left bg-primary/30 hover:bg-primary/50 border border-green-500/20 rounded-lg transition-colors text-green-300 font-medium">
-                📈 Performance Benchmarking
-              </button>
-            </div>
-          </Card>
-
-          <Card title="📢 Market Intelligence">
-            <div className="space-y-4">
-              <div className="p-4 bg-gradient-to-r from-green-500/10 to-green-400/10 border border-green-500/30 rounded-lg">
-                <p className="text-sm text-gray-300 mb-2">
-                  🔥 Hot Sector: AI in Healthcare
-                </p>
-                <p className="text-xs text-gray-400">
-                  3 new high-quality deals matching your criteria this week
-                </p>
-              </div>
-              <div className="p-4 bg-gradient-to-r from-blue-500/10 to-blue-400/10 border border-blue-500/30 rounded-lg">
-                <p className="text-sm text-gray-300 mb-2">
-                  💡 Exit Alert: Portfolio Company
-                </p>
-                <p className="text-xs text-gray-400">
-                  DataViz Systems received acquisition offer at 3.5x valuation
-                </p>
-              </div>
-            </div>
-          </Card>
-        </div>
-
         {/* Bottom CTA */}
         <div className="mt-8 bg-gradient-to-r from-green-600/20 to-green-500/20 border border-green-500/30 rounded-2xl p-8 text-center">
           <h2 className="text-2xl font-bold text-white mb-2">
@@ -375,20 +343,11 @@ export default function InvestorDashboard() {
           <p className="text-gray-300 mb-6">
             Access our full deal flow and grow your investment portfolio
           </p>
-          <button className="inline-block px-8 py-4 bg-green-500 hover:bg-green-600 text-white rounded-xl font-semibold transition-all hover:scale-105">
+          <button className="px-8 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors">
             Explore Investment Network →
           </button>
         </div>
       </div>
-      {/* Add Blockchain Section */}
-      {!walletAddress ? (
-        <button onClick={connectWallet}>Connect Wallet to View Balance</button>
-      ) : (
-        <div>
-          <p>Wallet: {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}</p>
-          <p>NGT Balance: {balance} NGT</p>
-        </div>
-      )}
     </div>
   );
 }

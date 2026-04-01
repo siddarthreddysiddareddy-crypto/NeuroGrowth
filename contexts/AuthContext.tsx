@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useCallback } from "react";
+import React, { createContext, useContext, useState, useCallback, useEffect } from "react";
 
 export type UserRole = "business" | "investor" | null;
 
@@ -32,6 +32,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     show: boolean;
   } | null>(null);
 
+  // Initialize user from localStorage on mount
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const storedUser = localStorage.getItem("user");
+      if (storedUser) {
+        try {
+          setUser(JSON.parse(storedUser));
+        } catch (e) {
+          console.error("Failed to parse stored user", e);
+        }
+      }
+    }
+  }, []);
+
   const setShowToast = useCallback(
     (message: string, type: "success" | "error") => {
       setToastState({ message, type, show: true });
@@ -60,11 +74,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         // Mock user data
         const mockName = email.split("@")[0];
-        setUser({
+        const userData = {
           name: mockName,
           email,
           role,
-        });
+        };
+        setUser(userData);
+        
+        // Store user and role in localStorage
+        if (typeof window !== "undefined") {
+          localStorage.setItem("user", JSON.stringify(userData));
+          localStorage.setItem("userRole", role || "");
+        }
 
         setShowToast("Login successful! Redirecting...", "success");
       } catch (error) {
@@ -99,11 +120,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
 
         // Set user after successful registration
-        setUser({
+        const userData = {
           name,
           email,
           role,
-        });
+        };
+        setUser(userData);
+        
+        // Store user and role in localStorage
+        if (typeof window !== "undefined") {
+          localStorage.setItem("user", JSON.stringify(userData));
+          localStorage.setItem("userRole", role || "");
+        }
 
         setShowToast("Registration successful! Welcome to NeuroGrowth!", "success");
       } catch (error) {
@@ -119,6 +147,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = useCallback(() => {
     setUser(null);
+    // Clear localStorage
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("user");
+      localStorage.removeItem("userRole");
+    }
     setShowToast("Logged out successfully", "success");
   }, [setShowToast]);
 

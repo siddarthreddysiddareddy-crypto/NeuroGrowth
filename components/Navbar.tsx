@@ -147,15 +147,19 @@ export default function Navbar() {
                 </Link>
               </div>
             )}
+            
+            {/* Connect Wallet Button */}
+            <button 
+              onClick={connectWallet}
+              className="px-4 py-2 ml-2 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white rounded-lg font-medium text-sm transition-all shadow-md shadow-blue-500/20 whitespace-nowrap"
+            >
+              {walletAddress
+                ? `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`
+                : "Connect Wallet"}
+            </button>
           </div>
         </div>
       </div>
-      {/* Add this button */}
-      <button onClick={connectWallet}>
-        {walletAddress
-          ? `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`
-          : "Connect Wallet"}
-      </button>
     </nav>
   );
 }

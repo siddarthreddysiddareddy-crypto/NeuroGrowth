@@ -1,8 +1,20 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function Home() {
+  const [selectedRole, setSelectedRole] = useState<"business" | "investor"| null>(null);
+  const { isAuthenticated, user } = useAuth();
+
+  // If authenticated, redirect to appropriate dashboard
+  const dashboardLink = isAuthenticated
+    ? user?.role === "business"
+      ? "/dashboard/business"
+      : "/dashboard/investor"
+    : null;
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary via-primary-light to-primary">
       {/* Hero Section */}
@@ -59,29 +71,80 @@ export default function Home() {
             ))}
           </div>
 
-          {/* CTA Button */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          {/* Role Selection or Dashboard Link */}
+          {isAuthenticated ? (
             <Link
-              href="/onboard"
-              className="btn-primary text-lg px-8 py-4 font-semibold hover:scale-110"
+              href={dashboardLink || "/"}
+              className="inline-block btn-primary text-lg px-8 py-4 font-semibold hover:scale-105"
             >
-              Start Your Growth Journey
+              Go to Your Dashboard
             </Link>
-            <div className="flex gap-4">
-              <Link
-                href="/dashboard/business"
-                className="btn-secondary text-lg px-8 py-4 font-semibold"
-              >
-                Business Dashboard
-              </Link>
-              <Link
-                href="/dashboard/investor"
-                className="btn-secondary text-lg px-8 py-4 font-semibold"
-              >
-                Investor Dashboard
-              </Link>
-            </div>
-          </div>
+          ) : (
+            <>
+              {/* Role Toggle */}
+              <div className="flex justify-center gap-4 mb-8">
+                <button
+                  onClick={() => setSelectedRole("business")}
+                  className={`px-6 py-3 rounded-lg font-semibold transition-all ${
+                    selectedRole === "business"
+                      ? "bg-blue-600 text-white shadow-lg"
+                      : "bg-blue-600/20 text-blue-300 hover:bg-blue-600/30"
+                  }`}
+                >
+                  🏢 Continue as Business
+                </button>
+                <button
+                  onClick={() => setSelectedRole("investor")}
+                  className={`px-6 py-3 rounded-lg font-semibold transition-all ${
+                    selectedRole === "investor"
+                      ? "bg-emerald-600 text-white shadow-lg"
+                      : "bg-emerald-600/20 text-emerald-300 hover:bg-emerald-600/30"
+                  }`}
+                >
+                  💰 Continue as Investor
+                </button>
+              </div>
+
+              {/* CTA Buttons */}
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                {selectedRole === "business" ? (
+                  <>
+                    <Link
+                      href="/auth/business/register"
+                      className="btn-primary text-lg px-8 py-4 font-semibold hover:scale-105"
+                    >
+                      Register as Business
+                    </Link>
+                    <Link
+                      href="/auth/business/login"
+                      className="btn-secondary text-lg px-8 py-4 font-semibold"
+                    >
+                      Already have account? Login
+                    </Link>
+                  </>
+                ) : selectedRole === "investor" ? (
+                  <>
+                    <Link
+                      href="/auth/investor/register"
+                      className="btn-primary text-lg px-8 py-4 font-semibold hover:scale-105"
+                    >
+                      Register as Investor
+                    </Link>
+                    <Link
+                      href="/auth/investor/login"
+                      className="btn-secondary text-lg px-8 py-4 font-semibold"
+                    >
+                      Already have account? Login
+                    </Link>
+                  </>
+                ) : (
+                  <p className="text-gray-400 text-sm">
+                    Select your role above to get started ↑
+                  </p>
+                )}
+              </div>
+            </>
+          )}
 
           {/* Trust Badges */}
           <div className="mt-16 pt-8 border-t border-primary-light/20">

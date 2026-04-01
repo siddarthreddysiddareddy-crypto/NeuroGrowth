@@ -2,6 +2,7 @@
 
 import Card from "@/components/Card";
 import Link from "next/link";
+import { formatCurrencyINR, formatCompactCurrencyINR } from "@/utils/formatting";
 
 // Mock Data for Business Dashboard
 const weeklyContentPlan = [
@@ -39,9 +40,9 @@ const campaignMetrics = [
 ];
 
 const activeCampaigns = [
-  { name: "Spring Sale 2024", status: "Active", progress: 75, roi: "$15,420" },
-  { name: "Q2 Product Launch", status: "Planning", progress: 40, roi: "TBD" },
-  { name: "Email Nurture Sequence", status: "Active", progress: 60, roi: "$8,950" },
+  { name: "Spring Sale 2024", status: "Active", progress: 75, roiNum: 1542000, roiDisplay: "₹15,42,000" },
+  { name: "Q2 Product Launch", status: "Planning", progress: 40, roiDisplay: "TBD" },
+  { name: "Email Nurture Sequence", status: "Active", progress: 60, roiNum: 895000, roiDisplay: "₹8,95,000" },
 ];
 
 export default function BusinessDashboard() {
@@ -151,7 +152,7 @@ export default function BusinessDashboard() {
                     <div className="flex justify-between text-xs text-gray-400">
                       <span>{campaign.progress}% complete</span>
                       <span className="text-green-400 font-semibold">
-                        ROI: {campaign.roi}
+                        ROI: {campaign.roiDisplay}
                       </span>
                     </div>
                   </div>

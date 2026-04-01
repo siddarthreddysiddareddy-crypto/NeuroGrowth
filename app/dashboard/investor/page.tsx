@@ -2,42 +2,60 @@
 
 import Card from "@/components/Card";
 import Link from "next/link";
+import { formatCurrencyINR, formatCompactCurrencyINR } from "@/utils/formatting";
 
 // Mock Data for Investor Dashboard
-const portfolioMetrics = [
-  { label: "Total Invested", value: "$2.45M", icon: "💰", trend: "+12%" },
-  { label: "Portfolio Value", value: "$3.18M", icon: "📈", trend: "+30%" },
+const portfolioMetricsRaw = [
+  { label: "Total Invested", amount: 2500000, icon: "💰", trend: "+12%" },
+  { label: "Portfolio Value", amount: 3180000, icon: "📈", trend: "+30%" },
   { label: "Active Investments", value: "12", icon: "🎯", trend: "+2" },
   { label: "ROI Average", value: "28.4%", icon: "✨", trend: "+4.2%" },
+];
+
+// Mock Stock Data
+const stocks = [
+  { name: "NeuroTech Labs", growth: "+3.4%" },
+  { name: "Growthify", growth: "+2.1%" },
+  { name: "FinGrow Solutions", growth: "-1.2%" },
+  { name: "VyaparX", growth: "+4.0%" },
+  { name: "TrendHive", growth: "-0.6%" },
 ];
 
 const dealPipeline = [
   {
     name: "TechStack AI",
     stage: "Series A",
-    amount: "$500K",
-    valuation: "$5M",
+    amountNum: 5000000,
+    amountDisplay: "₹50,00,000",
+    valuationNum: 50000000,
+    valuationDisplay: "₹5,00,00,000",
     match: "92%",
   },
   {
     name: "GreenFlow Solar",
     stage: "Seed",
-    amount: "$250K",
-    valuation: "$2M",
+    amountNum: 2500000,
+    amountDisplay: "₹25,00,000",
+    valuationNum: 20000000,
+    valuationDisplay: "₹2,00,00,000",
     match: "87%",
   },
   {
     name: "CloudSync solutions",
     stage: "Series B",
-    amount: "$1.2M",
-    valuation: "$25M",
+    amountNum: 12000000,
+    amountDisplay: "₹1,20,00,000",
+    valuationNum: 250000000,
+    valuationDisplay: "₹25,00,00,000",
     match: "95%",
   },
   {
     name: "FinanceAI Pro",
     stage: "Series A",
-    amount: "$750K",
-    valuation: "$8M",
+    amountNum: 7500000,
+    amountDisplay: "₹75,00,000",
+    valuationNum: 80000000,
+    valuationDisplay: "₹8,00,00,000",
     match: "89%",
   },
 ];
@@ -45,29 +63,37 @@ const dealPipeline = [
 const portfolio = [
   {
     name: "DataViz Systems",
-    invested: "$300K",
-    current: "$450K",
+    investedNum: 3000000,
+    investedDisplay: "₹30,00,000",
+    currentNum: 4500000,
+    currentDisplay: "₹45,00,000",
     return: "+150%",
     stage: "Growth",
   },
   {
     name: "HealthTech Labs",
-    invested: "$200K",
-    current: "$520K",
+    investedNum: 2000000,
+    investedDisplay: "₹20,00,000",
+    currentNum: 5200000,
+    currentDisplay: "₹52,00,000",
     return: "+260%",
     stage: "On Track",
   },
   {
     name: "EcoMove Logistics",
-    invested: "$400K",
-    current: "$400K",
+    investedNum: 4000000,
+    investedDisplay: "₹40,00,000",
+    currentNum: 4000000,
+    currentDisplay: "₹40,00,000",
     return: "0%",
     stage: "Early",
   },
   {
     name: "CloudNine Storage",
-    invested: "$250K",
-    current: "$680K",
+    investedNum: 2500000,
+    investedDisplay: "₹25,00,000",
+    currentNum: 6800000,
+    currentDisplay: "₹68,00,000",
     return: "+172%",
     stage: "Exit Prep",
   },
@@ -78,21 +104,21 @@ const opportunities = [
     title: "AI-Powered Healthcare",
     description: "Telemedicine platform with AI diagnostics",
     stage: "Seed",
-    amount: "$300K - $500K",
+    amountRange: "₹30,00,000 - ₹50,00,000",
     match: "94%",
   },
   {
     title: "Sustainable Fashion Tech",
     description: "Blockchain supply chain for ethical fashion",
     stage: "Series A",
-    amount: "$750K - $1.2M",
+    amountRange: "₹75,00,000 - ₹1,20,00,000",
     match: "88%",
   },
   {
     title: "Fintech for Emerging Markets",
     description: "Payment solutions for underbanked populations",
     stage: "Series B",
-    amount: "$1.5M - $2.5M",
+    amountRange: "₹1,50,00,000 - ₹2,50,00,000",
     match: "91%",
   },
 ];
@@ -120,18 +146,54 @@ export default function InvestorDashboard() {
 
         {/* Portfolio Metrics Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {portfolioMetrics.map((metric, i) => (
+          {portfolioMetricsRaw.map((metric, i) => (
             <Card key={i} className="text-center">
               <div className="text-4xl mb-3">{metric.icon}</div>
               <h3 className="text-gray-400 text-sm mb-2">{metric.label}</h3>
               <div className="flex items-baseline justify-center gap-2">
-                <p className="text-3xl font-bold text-white">{metric.value}</p>
+                <p className="text-3xl font-bold text-white">
+                  {metric.amount ? formatCompactCurrencyINR(metric.amount) : metric.value}
+                </p>
                 <span className="text-green-400 text-sm font-semibold">
                   {metric.trend}
                 </span>
               </div>
             </Card>
           ))}
+        </div>
+
+        {/* Market Overview Section */}
+        <div className="mb-8">
+          <Card title="📊 Market Overview">
+            <p className="text-gray-400 text-sm mb-6">
+              Real-time market movements for promising startup ecosystem companies:
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+              {stocks.map((stock, i) => {
+                const isPositive = stock.growth.startsWith("+");
+                return (
+                  <div
+                    key={i}
+                    className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4 hover:scale-105 transition duration-300 cursor-pointer hover:bg-white/15"
+                  >
+                    <p className="font-semibold text-white mb-2 text-sm">
+                      {stock.name}
+                    </p>
+                    <div
+                      className={`text-2xl font-bold ${
+                        isPositive ? "text-green-400" : "text-red-400"
+                      }`}
+                    >
+                      {stock.growth}
+                    </div>
+                    <p className="text-xs text-gray-400 mt-2">
+                      {isPositive ? "📈 Bullish" : "📉 Bearish"}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+          </Card>
         </div>
 
         {/* Main Content Grid */}
@@ -155,7 +217,7 @@ export default function InvestorDashboard() {
                             {deal.stage}
                           </span>
                           <span className="text-xs px-2 py-1 bg-green-500/20 text-green-300 rounded-full font-medium">
-                            Raise: {deal.amount}
+                            Raise: {deal.amountDisplay}
                           </span>
                         </div>
                       </div>
@@ -173,7 +235,7 @@ export default function InvestorDashboard() {
                       ></div>
                     </div>
                     <p className="text-xs text-gray-500 mt-2">
-                      Valuation: {deal.valuation}
+                      Valuation: {deal.valuationDisplay}
                     </p>
                   </div>
                 ))}
@@ -198,7 +260,7 @@ export default function InvestorDashboard() {
                       {investment.name}
                     </p>
                     <div className="flex justify-between text-xs text-gray-400 mb-2">
-                      <span>${investment.invested}</span>
+                      <span>{investment.investedDisplay}</span>
                       <span className="text-green-400 font-semibold">
                         {investment.return}
                       </span>
@@ -243,7 +305,7 @@ export default function InvestorDashboard() {
                         {opp.match}% match
                       </span>
                     </div>
-                    <p className="text-blue-300 font-medium">Seeking: {opp.amount}</p>
+                    <p className="text-blue-300 font-medium">Seeking: {opp.amountRange}</p>
                   </div>
                   <button className="w-full px-3 py-2 bg-green-500/20 hover:bg-green-500/30 border border-green-500/50 text-green-300 rounded-lg transition-colors text-xs font-medium">
                     View Full Details

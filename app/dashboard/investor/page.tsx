@@ -5,6 +5,9 @@ import ChatBox from "@/components/ChatBox";
 import { formatCurrencyINR, formatCompactCurrencyINR } from "@/utils/formatting";
 import { useEffect } from "react";
 import { useNeuroGrowth } from "../../../hooks/useNeuroGrowth";
+import { Opportunity } from "@/types/database";
+import { useAuth } from "@/contexts/AuthContext";
+import Toast from "@/components/Toast";
 
 // Mock Data
 const portfolioMetricsRaw = [
@@ -21,33 +24,42 @@ const stocks = [
   { name: "TrendHive", growth: "-0.6%" },
 ];
 
-const dealPipeline = [
+const dealPipeline: Opportunity[] = [
   {
+    id: "opp1",
     name: "TechStack AI",
     stage: "Series A",
-    amountNum: 5000000,
+    amountRaised: 5000000,
     amountDisplay: "₹50,00,000",
-    valuationNum: 50000000,
+    valuation: 50000000,
     valuationDisplay: "₹5,00,00,000",
-    match: "92%",
+    matchScore: 92,
+    industry: "AI",
+    createdAt: new Date().toISOString()
   },
   {
+    id: "opp2",
     name: "GreenFlow Solar",
     stage: "Seed",
-    amountNum: 2500000,
+    amountRaised: 2500000,
     amountDisplay: "₹25,00,000",
-    valuationNum: 20000000,
+    valuation: 20000000,
     valuationDisplay: "₹2,00,00,000",
-    match: "87%",
+    matchScore: 87,
+    industry: "GreenTech",
+    createdAt: new Date().toISOString()
   },
   {
+    id: "opp3",
     name: "CloudSync solutions",
     stage: "Series B",
-    amountNum: 12000000,
+    amountRaised: 12000000,
     amountDisplay: "₹1,20,00,000",
-    valuationNum: 250000000,
+    valuation: 250000000,
     valuationDisplay: "₹25,00,00,000",
-    match: "95%",
+    matchScore: 95,
+    industry: "SaaS",
+    createdAt: new Date().toISOString()
   },
 ];
 
@@ -82,13 +94,24 @@ const portfolioSummary = [
 ];
 
 export default function InvestorDashboard() {
-  const { walletAddress, balance, connectWallet, fetchBalance } = useNeuroGrowth();
+  const { walletAddress, userBalance, connectWallet, fetchBalance, stakeTokens, isPending } = useNeuroGrowth();
+  const { setShowToast } = useAuth();
 
   useEffect(() => {
     if (walletAddress) fetchBalance(walletAddress);
   }, [walletAddress]);
 
-  const displayBalance = balance ? parseFloat(balance).toLocaleString(undefined, { maximumFractionDigits: 2 }) : "0";
+  const displayBalance = userBalance ? parseFloat(userBalance).toLocaleString(undefined, { maximumFractionDigits: 2 }) : "0";
+
+  const handleStake = async () => {
+    try {
+      setShowToast("Transaction Pending...", "success");
+      await stakeTokens("100");
+      setShowToast("Success! Staked 100 NEURO.", "success");
+    } catch (error: any) {
+      setShowToast(error.message || "Transaction Rejected", "error");
+    }
+  };
 
   return (
     <div className="p-8 pt-20">
@@ -121,15 +144,26 @@ export default function InvestorDashboard() {
         {/* Portfolio Metrics Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {/* Live Token Balance Card */}
-          <Card className="text-center relative overflow-hidden group">
-            <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-            <div className="text-4xl mb-3">🪙</div>
-            <h3 className="text-gray-400 text-sm mb-2">NEURO Balance</h3>
-            <div className="flex items-baseline justify-center gap-2">
-              <p className="text-3xl font-bold text-white">
-                {displayBalance} <span className="text-lg text-green-400">NGR</span>
-              </p>
+          <Card className="text-center relative overflow-hidden group flex flex-col justify-between">
+            <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
+            <div>
+              <div className="text-4xl mb-3">🪙</div>
+              <h3 className="text-gray-400 text-sm mb-2">NEURO Balance</h3>
+              <div className="flex items-baseline justify-center gap-2 mb-4">
+                <p className="text-3xl font-bold text-white">
+                  {displayBalance} <span className="text-lg text-green-400">NGR</span>
+                </p>
+              </div>
             </div>
+            {walletAddress && (
+              <button 
+                onClick={handleStake}
+                disabled={isPending}
+                className="w-full mt-auto bg-green-500 hover:bg-green-600 disabled:bg-gray-600 disabled:cursor-not-allowed text-white py-2 rounded-lg text-sm font-bold transition-all shadow-md shadow-green-500/20"
+              >
+                {isPending ? "Confirming..." : "Stake 100 NEURO"}
+              </button>
+            )}
           </Card>
 
           {/* Static Metrics */}
@@ -210,14 +244,14 @@ export default function InvestorDashboard() {
                       <div className="text-right">
                         <p className="text-sm text-gray-400">Match Score</p>
                         <p className="text-2xl font-bold text-green-400">
-                          {deal.match}
+                          {deal.matchScore}%
                         </p>
                       </div>
                     </div>
                     <div className="w-full bg-white/10 rounded-full h-2">
                       <div
                         className="bg-gradient-to-r from-green-400 to-green-600 h-2 rounded-full transition-all"
-                        style={{ width: deal.match }}
+                        style={{ width: `${deal.matchScore}%` }}
                       ></div>
                     </div>
                     <p className="text-xs text-gray-500 mt-2">
@@ -297,6 +331,8 @@ export default function InvestorDashboard() {
             </div>
           </Card>
         </div>
+
+        <Toast />
     </div>
   );
 }

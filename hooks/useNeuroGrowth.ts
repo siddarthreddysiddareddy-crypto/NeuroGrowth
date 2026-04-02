@@ -14,9 +14,13 @@ declare global {
 export function useNeuroGrowth() {
 
   const [walletAddress, setWalletAddress] = useState("");
-  const [balance, setBalance] = useState("");
+  const [userBalance, setUserBalance] = useState("");
   const [status, setStatus] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isConnecting, setIsConnecting] = useState(false);
+  const [isConnected, setIsConnected] = useState(false);
+  const [isPending, setIsPending] = useState(false);
+  const [error, setError] = useState("");
 
   // Verify Network
   async function verifyNetwork(provider: ethers.BrowserProvider) {
@@ -32,14 +36,28 @@ export function useNeuroGrowth() {
   // Listen to MetaMask events
   useEffect(() => {
     if (typeof window.ethereum !== "undefined") {
+      // Check if already connected
+      window.ethereum.request({ method: 'eth_accounts' })
+        .then((accounts: string[]) => {
+          if (accounts.length > 0) {
+            setWalletAddress(accounts[0]);
+            setIsConnected(true);
+            fetchBalance(accounts[0]);
+            setStatus("Wallet connected!");
+          }
+        })
+        .catch(console.error);
+
       const handleAccountsChanged = (accounts: string[]) => {
         if (accounts.length > 0) {
           setWalletAddress(accounts[0]);
+          setIsConnected(true);
           fetchBalance(accounts[0]);
           setStatus("Wallet connected!");
         } else {
           setWalletAddress("");
-          setBalance("");
+          setUserBalance("");
+          setIsConnected(false);
           setStatus("Wallet disconnected!");
         }
       };
@@ -66,25 +84,38 @@ export function useNeuroGrowth() {
       return;
     }
     try {
+      setIsConnecting(true);
+      setError("");
       const provider = new ethers.BrowserProvider(window.ethereum);
       const isCorrectNetwork = await verifyNetwork(provider);
-      if (!isCorrectNetwork) return;
+      if (!isCorrectNetwork) {
+          setIsConnecting(false);
+          return;
+      }
 
       const accounts = await provider.send("eth_requestAccounts", []);
       setWalletAddress(accounts[0]);
+      setIsConnected(true);
       await fetchBalance(accounts[0]);
       setStatus("Wallet connected!");
-    } catch (error: any) {
-      setStatus("❌ Connection failed: " + error.message);
+    } catch (err: any) {
+      setError("❌ Connection failed: " + err.message);
+      setStatus("❌ Connection failed: " + err.message);
+    } finally {
+      setIsConnecting(false);
     }
   }
 
   // Fetch Balance
   async function fetchBalance(address: string) {
-    const provider = new ethers.BrowserProvider(window.ethereum);
-    const contract = new ethers.Contract(CONTRACT_ADDRESS, ABI.abi, provider);
-    const bal = await contract.balanceOf(address);
-    setBalance(ethers.formatUnits(bal, 18));
+    try {
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const contract = new ethers.Contract(CONTRACT_ADDRESS, ABI.abi, provider);
+      const bal = await contract.balanceOf(address);
+      setUserBalance(ethers.formatUnits(bal, 18));
+    } catch (e) {
+      console.error("Error fetching balance:", e);
+    }
   }
 
   // Send Tokens
@@ -119,13 +150,78 @@ export function useNeuroGrowth() {
     }
   }
 
+  // Fund Campaign Shell
+  async function fundCampaign(campaignId: string, amount: string) {
+    if (!isConnected) {
+      setError("Connect wallet first!");
+      return;
+    }
+    try {
+      setLoading(true);
+      setStatus("Funding campaign...");
+      // TODO: Replace with specific ABI call
+      // const provider = new ethers.BrowserProvider(window.ethereum);
+      // const signer = await provider.getSigner();
+      // const contract = new ethers.Contract(CONTRACT_ADDRESS, ABI.abi, signer);
+      // const tx = await contract.fundCampaign(campaignId, ethers.parseUnits(amount, 18));
+      // await tx.wait();
+      
+      console.log(`Mocking funding campaign ${campaignId} with ${amount} tokens.`);
+      await new Promise(res => setTimeout(res, 1000));
+      setStatus("✅ Campaign founded!");
+    } catch (err: any) {
+      setError("❌ Error: " + err.message);
+      setStatus("❌ Error: " + err.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // Stake Tokens Shell (converted to real transaction)
+  async function stakeTokens(amount: string) {
+    if (!isConnected || !walletAddress) {
+      setError("Connect wallet first!");
+      throw new Error("Connect wallet first!");
+    }
+    try {
+      setIsPending(true);
+      setError("");
+      setStatus("Staking tokens...");
+      
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const signer = await provider.getSigner();
+      const contract = new ethers.Contract(CONTRACT_ADDRESS, ABI.abi, signer);
+      
+      // We simulate staking by transferring to the contract address itself
+      const tx = await contract.transfer(CONTRACT_ADDRESS, ethers.parseUnits(amount, 18));
+      
+      setStatus("Transaction initiated. Waiting for confirmation...");
+      await tx.wait();
+      
+      setStatus("✅ Tokens staked!");
+      await fetchBalance(walletAddress); // Refresh balance
+    } catch (err: any) {
+      setError("❌ Error: " + err.message);
+      setStatus("❌ Error: " + err.message);
+      throw err; // rethrow allowing callers to catch it
+    } finally {
+      setIsPending(false);
+    }
+  }
+
   return {
     walletAddress,
-    balance,
+    userBalance,
     status,
     loading,
+    isConnecting,
+    isConnected,
+    isPending,
+    error,
     connectWallet,
     sendTokens,
-    fetchBalance
+    fetchBalance,
+    fundCampaign,
+    stakeTokens
   };
 }

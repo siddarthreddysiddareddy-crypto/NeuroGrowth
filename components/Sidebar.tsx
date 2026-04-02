@@ -53,7 +53,7 @@ export default function Sidebar() {
               <Link
                 href="/dashboard/business"
                 className={`block px-4 py-3 rounded-lg transition-colors ${
-                  isBusinessDashboard
+                  pathname === "/dashboard/business"
                     ? "bg-blue-500/20 text-blue-300 border border-blue-500/30"
                     : "text-gray-300 hover:text-white hover:bg-white/5"
                 }`}
@@ -61,26 +61,42 @@ export default function Sidebar() {
                 📊 Dashboard
               </Link>
               <Link
-                href="#"
-                className="block px-4 py-3 rounded-lg text-gray-300 hover:text-white hover:bg-white/5 transition-colors"
+                href="/dashboard/business/analytics"
+                className={`block px-4 py-3 rounded-lg transition-colors ${
+                  pathname === "/dashboard/business/analytics"
+                    ? "bg-blue-500/20 text-blue-300 border border-blue-500/30"
+                    : "text-gray-300 hover:text-white hover:bg-white/5"
+                }`}
               >
                 📈 Analytics
               </Link>
               <Link
-                href="#"
-                className="block px-4 py-3 rounded-lg text-gray-300 hover:text-white hover:bg-white/5 transition-colors"
+                href="/dashboard/business/campaigns"
+                className={`block px-4 py-3 rounded-lg transition-colors ${
+                  pathname === "/dashboard/business/campaigns"
+                    ? "bg-blue-500/20 text-blue-300 border border-blue-500/30"
+                    : "text-gray-300 hover:text-white hover:bg-white/5"
+                }`}
               >
                 📱 Campaigns
               </Link>
               <Link
-                href="#"
-                className="block px-4 py-3 rounded-lg text-gray-300 hover:text-white hover:bg-white/5 transition-colors"
+                href="/dashboard/business/ai-tools"
+                className={`block px-4 py-3 rounded-lg transition-colors ${
+                  pathname === "/dashboard/business/ai-tools"
+                    ? "bg-blue-500/20 text-blue-300 border border-blue-500/30"
+                    : "text-gray-300 hover:text-white hover:bg-white/5"
+                }`}
               >
                 🤖 AI Tools
               </Link>
               <Link
-                href="#"
-                className="block px-4 py-3 rounded-lg text-gray-300 hover:text-white hover:bg-white/5 transition-colors"
+                href="/dashboard/business/settings"
+                className={`block px-4 py-3 rounded-lg transition-colors ${
+                  pathname === "/dashboard/business/settings"
+                    ? "bg-blue-500/20 text-blue-300 border border-blue-500/30"
+                    : "text-gray-300 hover:text-white hover:bg-white/5"
+                }`}
               >
                 ⚙️ Settings
               </Link>

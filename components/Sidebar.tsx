@@ -108,7 +108,7 @@ export default function Sidebar() {
               <Link
                 href="/dashboard/investor"
                 className={`block px-4 py-3 rounded-lg transition-colors ${
-                  isInvestorDashboard
+                  pathname === "/dashboard/investor"
                     ? "bg-green-500/20 text-green-300 border border-green-500/30"
                     : "text-gray-300 hover:text-white hover:bg-white/5"
                 }`}
@@ -116,26 +116,42 @@ export default function Sidebar() {
                 💰 Dashboard
               </Link>
               <Link
-                href="#"
-                className="block px-4 py-3 rounded-lg text-gray-300 hover:text-white hover:bg-white/5 transition-colors"
+                href="/dashboard/investor/opportunities"
+                className={`block px-4 py-3 rounded-lg transition-colors ${
+                  pathname === "/dashboard/investor/opportunities" || pathname.startsWith("/dashboard/investor/opportunities/")
+                    ? "bg-green-500/20 text-green-300 border border-green-500/30"
+                    : "text-gray-300 hover:text-white hover:bg-white/5"
+                }`}
               >
-                📋 Opportunities
+                ✨ Opportunities
               </Link>
               <Link
-                href="#"
-                className="block px-4 py-3 rounded-lg text-gray-300 hover:text-white hover:bg-white/5 transition-colors"
+                href="/dashboard/investor/portfolio"
+                className={`block px-4 py-3 rounded-lg transition-colors ${
+                  pathname === "/dashboard/investor/portfolio" || pathname.startsWith("/dashboard/investor/portfolio/")
+                    ? "bg-green-500/20 text-green-300 border border-green-500/30"
+                    : "text-gray-300 hover:text-white hover:bg-white/5"
+                }`}
               >
-                📊 Portfolio
+                💼 Portfolio
               </Link>
               <Link
-                href="#"
-                className="block px-4 py-3 rounded-lg text-gray-300 hover:text-white hover:bg-white/5 transition-colors"
+                href="/dashboard/investor/network"
+                className={`block px-4 py-3 rounded-lg transition-colors ${
+                  pathname === "/dashboard/investor/network" || pathname.startsWith("/dashboard/investor/network/")
+                    ? "bg-green-500/20 text-green-300 border border-green-500/30"
+                    : "text-gray-300 hover:text-white hover:bg-white/5"
+                }`}
               >
-                💡 Network
+                🤝 Network
               </Link>
               <Link
-                href="#"
-                className="block px-4 py-3 rounded-lg text-gray-300 hover:text-white hover:bg-white/5 transition-colors"
+                href="/dashboard/investor/settings"
+                className={`block px-4 py-3 rounded-lg transition-colors ${
+                  pathname === "/dashboard/investor/settings" || pathname.startsWith("/dashboard/investor/settings/")
+                    ? "bg-green-500/20 text-green-300 border border-green-500/30"
+                    : "text-gray-300 hover:text-white hover:bg-white/5"
+                }`}
               >
                 ⚙️ Settings
               </Link>

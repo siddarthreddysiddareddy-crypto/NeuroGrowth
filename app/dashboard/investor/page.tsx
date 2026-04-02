@@ -6,14 +6,13 @@ import { formatCurrencyINR, formatCompactCurrencyINR } from "@/utils/formatting"
 import { useEffect } from "react";
 import { useNeuroGrowth } from "../../../hooks/useNeuroGrowth";
 
-// Mock Data for Investor Dashboard
+// Mock Data
 const portfolioMetricsRaw = [
   { label: "Portfolio Value", amount: 3180000, icon: "📈", trend: "+30%" },
   { label: "Active Investments", value: "12", icon: "🎯", trend: "+2" },
   { label: "ROI Average", value: "28.4%", icon: "✨", trend: "+4.2%" },
 ];
 
-// Mock Stock Data
 const stocks = [
   { name: "NeuroTech Labs", growth: "+3.4%" },
   { name: "Growthify", growth: "+2.1%" },
@@ -52,7 +51,7 @@ const dealPipeline = [
   },
 ];
 
-const portfolio = [
+const portfolioSummary = [
   {
     name: "DataViz Systems",
     investedNum: 3000000,
@@ -82,30 +81,6 @@ const portfolio = [
   },
 ];
 
-const opportunities = [
-  {
-    title: "AI-Powered Healthcare",
-    description: "Telemedicine platform with AI diagnostics",
-    stage: "Seed",
-    amountRange: "₹30,00,000 - ₹50,00,000",
-    match: "94%",
-  },
-  {
-    title: "Sustainable Fashion Tech",
-    description: "Blockchain supply chain for ethical fashion",
-    stage: "Series A",
-    amountRange: "₹75,00,000 - ₹1,20,00,000",
-    match: "88%",
-  },
-  {
-    title: "Fintech for Emerging Markets",
-    description: "Payment solutions for underbanked populations",
-    stage: "Series B",
-    amountRange: "₹1,50,00,000 - ₹2,50,00,000",
-    match: "91%",
-  },
-];
-
 export default function InvestorDashboard() {
   const { walletAddress, balance, connectWallet, fetchBalance } = useNeuroGrowth();
 
@@ -116,8 +91,7 @@ export default function InvestorDashboard() {
   const displayBalance = balance ? parseFloat(balance).toLocaleString(undefined, { maximumFractionDigits: 2 }) : "0";
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0B1E3A] via-[#0E2650] to-[#0B1E3A] ml-64 pt-20">
-      <div className="p-8">
+    <div className="p-8 pt-20">
         {/* Dashboard Header */}
         <div className="mb-12 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
           <div>
@@ -129,14 +103,14 @@ export default function InvestorDashboard() {
             </p>
           </div>
           {walletAddress && (
-            <div className="flex items-center gap-3 bg-blue-500/10 border border-blue-500/30 px-5 py-3 rounded-xl shadow-lg shadow-blue-500/5">
+            <div className="flex items-center gap-3 bg-green-500/10 border border-green-500/30 px-5 py-3 rounded-xl shadow-lg shadow-green-500/5">
               <div className="relative flex h-3 w-3">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
               </div>
               <div className="flex flex-col">
                 <span className="text-xs text-gray-400 uppercase tracking-wider font-semibold">Connected Wallet</span>
-                <span className="text-blue-300 text-sm font-medium tracking-wide">
+                <span className="text-green-300 text-sm font-medium tracking-wide">
                   {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}
                 </span>
               </div>
@@ -148,12 +122,12 @@ export default function InvestorDashboard() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {/* Live Token Balance Card */}
           <Card className="text-center relative overflow-hidden group">
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
             <div className="text-4xl mb-3">🪙</div>
             <h3 className="text-gray-400 text-sm mb-2">NEURO Balance</h3>
             <div className="flex items-baseline justify-center gap-2">
               <p className="text-3xl font-bold text-white">
-                {displayBalance} <span className="text-lg text-blue-400">NGR</span>
+                {displayBalance} <span className="text-lg text-green-400">NGR</span>
               </p>
             </div>
           </Card>
@@ -263,7 +237,7 @@ export default function InvestorDashboard() {
           <div>
             <Card title="📊 Portfolio Summary">
               <div className="space-y-3">
-                {portfolio.slice(0, 3).map((investment, i) => (
+                {portfolioSummary.slice(0, 3).map((investment, i) => (
                   <div
                     key={i}
                     className="p-3 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 transition-colors"
@@ -284,14 +258,15 @@ export default function InvestorDashboard() {
                 ))}
               </div>
 
-              <button className="w-full mt-6 px-4 py-2 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/50 text-blue-300 rounded-lg transition-colors text-sm font-medium">
+              <button className="w-full mt-6 px-4 py-2 bg-green-500/20 hover:bg-green-500/30 border border-green-500/50 text-green-300 rounded-lg transition-colors text-sm font-medium">
                 View Full Portfolio
               </button>
             </Card>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+        {/* AI Advisor & Market Intelligence */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* AI Advisor */}
           <div className="lg:col-span-2 h-96">
             <ChatBox 
@@ -322,61 +297,6 @@ export default function InvestorDashboard() {
             </div>
           </Card>
         </div>
-
-        {/* Recommended Opportunities */}
-        <Card title="✨ AI-Recommended Opportunities">
-          <div>
-            <p className="text-gray-400 text-sm mb-6">
-              Personalized investment opportunities matched to your profile:
-            </p>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {opportunities.map((opp, i) => (
-                <div
-                  key={i}
-                  className="bg-white/5 border border-green-500/20 rounded-lg p-4 hover:bg-white/10 hover:border-green-500/40 transition-all group cursor-pointer"
-                >
-                  <p className="font-semibold text-green-400 mb-2 text-sm">
-                    {opp.title}
-                  </p>
-                  <p className="text-gray-300 text-sm leading-relaxed mb-4">
-                    {opp.description}
-                  </p>
-                  <div className="space-y-2 text-xs mb-4">
-                    <div className="flex justify-between text-gray-400">
-                      <span>Stage: {opp.stage}</span>
-                      <span className="text-green-400 font-semibold">
-                        {opp.match}% match
-                      </span>
-                    </div>
-                    <p className="text-blue-300 font-medium">Seeking: {opp.amountRange}</p>
-                  </div>
-                  <button className="w-full px-3 py-2 bg-green-500/20 hover:bg-green-500/30 border border-green-500/50 text-green-300 rounded-lg transition-colors text-xs font-medium">
-                    View Full Details
-                  </button>
-                </div>
-              ))}
-            </div>
-
-            <button className="w-full mt-6 px-4 py-3 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white rounded-lg transition-all font-semibold flex items-center justify-center gap-2">
-              🔍 Browse All Deals
-            </button>
-          </div>
-        </Card>
-
-        {/* Bottom CTA */}
-        <div className="mt-8 bg-gradient-to-r from-green-600/20 to-green-500/20 border border-green-500/30 rounded-2xl p-8 text-center">
-          <h2 className="text-2xl font-bold text-white mb-2">
-            Connect with More Investment Opportunities
-          </h2>
-          <p className="text-gray-300 mb-6">
-            Access our full deal flow and grow your investment portfolio
-          </p>
-          <button className="px-8 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors">
-            Explore Investment Network →
-          </button>
-        </div>
-      </div>
     </div>
   );
 }

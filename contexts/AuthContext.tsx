@@ -1,10 +1,12 @@
 "use client";
 
 import React, { createContext, useContext, useState, useCallback, useEffect } from "react";
+import { supabase } from "@/lib/supabaseClient";
 
 export type UserRole = "business" | "investor" | null;
 
 export interface User {
+  id: string;
   name: string;
   email: string;
   role: UserRole;
@@ -15,8 +17,8 @@ interface AuthContextType {
   isLoading: boolean;
   isAuthenticated: boolean;
   login: (email: string, password: string, role: UserRole) => Promise<void>;
-  register: (name: string, email: string, password: string, role: UserRole) => Promise<void>;
-  logout: () => void;
+  register: (name: string, email: string, password: string, role: UserRole, additionalData?: Record<string, any>) => Promise<void>;
+  logout: () => Promise<void>;
   setShowToast: (message: string, type: "success" | "error") => void;
   toast: { message: string; type: "success" | "error"; show: boolean } | null;
 }
@@ -32,18 +34,65 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     show: boolean;
   } | null>(null);
 
-  // Initialize user from localStorage on mount
+  // Initialize user from Supabase session on mount
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const storedUser = localStorage.getItem("user");
-      if (storedUser) {
-        try {
-          setUser(JSON.parse(storedUser));
-        } catch (e) {
-          console.error("Failed to parse stored user", e);
+    const initAuth = async () => {
+      try {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+
+        if (session?.user) {
+          // Fetch user profile from database
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("*")
+            .eq("id", session.user.id)
+            .single();
+
+          if (profile) {
+            setUser({
+              id: session.user.id,
+              name: profile.full_name,
+              email: profile.email,
+              role: profile.role,
+            });
+          }
         }
+      } catch (error) {
+        console.error("Failed to initialize auth:", error);
       }
-    }
+    };
+
+    initAuth();
+
+    // Listen for auth changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (session?.user) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", session.user.id)
+          .single();
+
+        if (profile) {
+          setUser({
+            id: session.user.id,
+            name: profile.full_name,
+            email: profile.email,
+            role: profile.role,
+          });
+        }
+      } else {
+        setUser(null);
+      }
+    });
+
+    return () => {
+      subscription?.unsubscribe();
+    };
   }, []);
 
   const setShowToast = useCallback(
@@ -60,34 +109,36 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     async (email: string, password: string, role: UserRole) => {
       setIsLoading(true);
       try {
-        // Simulate login delay
-        await new Promise((resolve) => setTimeout(resolve, 1500));
-
-        // Simulate validation
         if (!email || !password) {
           throw new Error("Please fill in all fields");
         }
 
-        if (password.length < 6) {
-          throw new Error("Password must be at least 6 characters");
-        }
-
-        // Mock user data
-        const mockName = email.split("@")[0];
-        const userData = {
-          name: mockName,
+        const { data, error } = await supabase.auth.signInWithPassword({
           email,
-          role,
-        };
-        setUser(userData);
-        
-        // Store user and role in localStorage
-        if (typeof window !== "undefined") {
-          localStorage.setItem("user", JSON.stringify(userData));
-          localStorage.setItem("userRole", role || "");
-        }
+          password,
+        });
 
-        setShowToast("Login successful! Redirecting...", "success");
+        if (error) throw error;
+
+        if (data.user) {
+          // Fetch user profile from database
+          const { data: profile, error: profileError } = await supabase
+            .from("profiles")
+            .select("*")
+            .eq("id", data.user.id)
+            .single();
+
+          if (profileError) throw profileError;
+
+          setUser({
+            id: data.user.id,
+            name: profile.full_name,
+            email: profile.email,
+            role: profile.role,
+          });
+
+          setShowToast("Login successful! Redirecting...", "success");
+        }
       } catch (error) {
         const message = error instanceof Error ? error.message : "Login failed";
         setShowToast(message, "error");
@@ -100,13 +151,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   );
 
   const register = useCallback(
-    async (name: string, email: string, password: string, role: UserRole) => {
+    async (
+      name: string,
+      email: string,
+      password: string,
+      role: UserRole,
+      additionalData?: Record<string, any>
+    ) => {
       setIsLoading(true);
       try {
-        // Simulate registration delay
-        await new Promise((resolve) => setTimeout(resolve, 1500));
-
-        // Simulate validation
         if (!name || !email || !password) {
           throw new Error("Please fill in all fields");
         }
@@ -119,19 +172,57 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           throw new Error("Please enter a valid email");
         }
 
-        // Set user after successful registration
-        const userData = {
+        // Create auth user
+        const { data, error: signUpError } = await supabase.auth.signUp({
+          email,
+          password,
+        });
+
+        if (signUpError) throw signUpError;
+
+        if (!data.user) throw new Error("Failed to create user account");
+
+        const userId = data.user.id;
+
+        // Create profile in database
+        const { error: profileError } = await supabase.from("profiles").insert({
+          id: userId,
+          email,
+          full_name: name,
+          role: role || "investor",
+        });
+
+        if (profileError) throw profileError;
+
+        // Handle role-specific data
+        if (role === "business" && additionalData) {
+          const { error: msmeError } = await supabase.from("msme_profiles").insert({
+            user_id: userId,
+            business_name: additionalData.business_name,
+            gst_number: additionalData.gst_number,
+            sector: additionalData.sector,
+            city: additionalData.city,
+            founding_year: additionalData.founding_year,
+            funding_target: additionalData.funding_target,
+            equity_offered: additionalData.equity_offered,
+          });
+
+          if (msmeError) throw msmeError;
+        } else if (role === "investor" && additionalData) {
+          const { error: investorError } = await supabase.from("investors").insert({
+            user_id: userId,
+            wallet_address: additionalData.wallet_address || null,
+          });
+
+          if (investorError) throw investorError;
+        }
+
+        setUser({
+          id: userId,
           name,
           email,
           role,
-        };
-        setUser(userData);
-        
-        // Store user and role in localStorage
-        if (typeof window !== "undefined") {
-          localStorage.setItem("user", JSON.stringify(userData));
-          localStorage.setItem("userRole", role || "");
-        }
+        });
 
         setShowToast("Registration successful! Welcome to NeuroGrowth!", "success");
       } catch (error) {
@@ -145,14 +236,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     [setShowToast]
   );
 
-  const logout = useCallback(() => {
-    setUser(null);
-    // Clear localStorage
-    if (typeof window !== "undefined") {
-      localStorage.removeItem("user");
-      localStorage.removeItem("userRole");
+  const logout = useCallback(async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      
+      setUser(null);
+      setShowToast("Logged out successfully", "success");
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Logout failed";
+      setShowToast(message, "error");
+      throw error;
     }
-    setShowToast("Logged out successfully", "success");
   }, [setShowToast]);
 
   const value: AuthContextType = {

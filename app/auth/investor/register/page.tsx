@@ -15,6 +15,7 @@ export default function InvestorRegister() {
     investorEmail: "",
     password: "",
     confirmPassword: "",
+    walletAddress: "",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -49,7 +50,15 @@ export default function InvestorRegister() {
     if (!validateForm()) return;
 
     try {
-      await register(formData.name, formData.investorEmail, formData.password, "investor");
+      await register(
+        formData.name,
+        formData.investorEmail,
+        formData.password,
+        "investor",
+        {
+          wallet_address: formData.walletAddress || null,
+        }
+      );
       setTimeout(() => router.push("/dashboard/investor"), 1500);
     } catch (error) {
       // Error is already shown via toast
@@ -93,6 +102,16 @@ export default function InvestorRegister() {
               value={formData.investorEmail}
               onChange={handleChange}
               error={errors.investorEmail}
+            />
+
+            <Input
+              label="Wallet Address (Optional)"
+              name="walletAddress"
+              type="text"
+              placeholder="0x742d35Cc6634C0532925a3b844Bc9e7595f42e99"
+              value={formData.walletAddress}
+              onChange={handleChange}
+              error={errors.walletAddress}
             />
 
             <Input

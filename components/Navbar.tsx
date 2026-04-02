@@ -12,7 +12,7 @@ export default function Navbar() {
   const { user, isAuthenticated, logout } = useAuth();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [userRole, setUserRole] = useState<string | null>(null);
-  const { walletAddress, connectWallet } = useNeuroGrowth();
+  const { walletAddress, userBalance, connectWallet } = useNeuroGrowth();
 
   // Get user role from localStorage
   useEffect(() => {
@@ -149,14 +149,24 @@ export default function Navbar() {
             )}
             
             {/* Connect Wallet Button */}
-            <button 
-              onClick={connectWallet}
-              className="px-4 py-2 ml-2 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white rounded-lg font-medium text-sm transition-all shadow-md shadow-blue-500/20 whitespace-nowrap"
-            >
-              {walletAddress
-                ? `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`
-                : "Connect Wallet"}
-            </button>
+            {walletAddress ? (
+              <div className="flex items-center ml-2 bg-primary/30 border border-blue-500/30 rounded-lg overflow-hidden shadow-md shadow-blue-500/10">
+                <div className="px-3 py-2 bg-blue-500/20 text-white font-medium text-sm border-r border-blue-500/30">
+                  {userBalance ? parseFloat(userBalance).toLocaleString(undefined, { maximumFractionDigits: 2 }) : "0"} NGT
+                </div>
+                <div className="px-4 py-2 text-blue-300 font-medium text-sm transition-all cursor-default flex items-center gap-2">
+                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.6)]"></div>
+                  {`${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`}
+                </div>
+              </div>
+            ) : (
+              <button 
+                onClick={connectWallet}
+                className="px-4 py-2 ml-2 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white rounded-lg font-medium text-sm transition-all shadow-md shadow-blue-500/20 whitespace-nowrap"
+              >
+                Connect Wallet
+              </button>
+            )}
           </div>
         </div>
       </div>

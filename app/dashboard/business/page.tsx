@@ -2,6 +2,7 @@
 
 import Card from "@/components/Card";
 import ChatBox from "@/components/ChatBox";
+import { Campaign } from "@/types/database";
 
 const campaignMetrics = [
   { label: "Engagement Rate", value: "12.7%", icon: "💬", trend: "+4.1%" },
@@ -9,10 +10,10 @@ const campaignMetrics = [
   { label: "Conversions", value: "342", icon: "✅", trend: "+12%" },
 ];
 
-const activeCampaigns = [
-  { name: "Spring Sale 2024", status: "Active", progress: 75, roiDisplay: "₹15,42,000" },
-  { name: "Q2 Product Launch", status: "Planning", progress: 40, roiDisplay: "TBD" },
-  { name: "Email Nurture Sequence", status: "Active", progress: 60, roiDisplay: "₹8,95,000" },
+const activeCampaigns: Campaign[] = [
+  { id: "c1", businessId: "b1", name: "Spring Sale 2024", status: "Active", progress: 75, roiDisplay: "₹15,42,000", createdAt: new Date().toISOString() },
+  { id: "c2", businessId: "b1", name: "Q2 Product Launch", status: "Planning", progress: 40, roiDisplay: "TBD", createdAt: new Date().toISOString() },
+  { id: "c3", businessId: "b1", name: "Email Nurture Sequence", status: "Active", progress: 60, roiDisplay: "₹8,95,000", createdAt: new Date().toISOString() },
 ];
 
 export default function MainDashboard() {

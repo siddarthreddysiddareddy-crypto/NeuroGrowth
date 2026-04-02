@@ -43,13 +43,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         } = await supabase.auth.getSession();
 
         if (session?.user) {
-          // Fetch user profile from database
           const { data: profile } = await supabase
             .from("profiles")
             .select("*")
             .eq("id", session.user.id)
             .single();
 
+          // Only set user if profile exists — avoids redirect loops when
+          // a session exists but email hasn't been confirmed yet.
           if (profile) {
             setUser({
               id: session.user.id,
@@ -66,24 +67,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     initAuth();
 
-    // Listen for auth changes
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (session?.user) {
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("*")
-          .eq("id", session.user.id)
-          .single();
+      if (event === "SIGNED_OUT") {
+        setUser(null);
+        return;
+      }
 
-        if (profile) {
-          setUser({
-            id: session.user.id,
-            name: profile.full_name,
-            email: profile.email,
-            role: profile.role,
-          });
+      if (session?.user) {
+        try {
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("*")
+            .eq("id", session.user.id)
+            .single();
+
+          if (profile) {
+            setUser({
+              id: session.user.id,
+              name: profile.full_name,
+              email: profile.email,
+              role: profile.role,
+            });
+          }
+          // If profile is null (e.g. email not confirmed), don't touch user state
+        } catch (err) {
+          console.error("onAuthStateChange profile fetch failed:", err);
         }
       } else {
         setUser(null);
@@ -182,46 +192,67 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         if (!data.user) throw new Error("Failed to create user account");
 
-        const userId = data.user.id;
+        // Guard: if email confirmation is required (identities array is empty
+        // or session is null), inform the user to verify their email instead
+        // of attempting profile inserts that will fail due to RLS.
+        if (data.session === null && !data.user.email_confirmed_at) {
+          setShowToast(
+            "Account created! Please check your email to confirm your account before logging in.",
+            "success"
+          );
+          return;
+        }
 
-        // Create profile in database
+        const userId = data.user.id;
+        const resolvedRole = role || "investor";
+
+        // Create base profile — this must succeed before role-specific inserts
         const { error: profileError } = await supabase.from("profiles").insert({
           id: userId,
           email,
           full_name: name,
-          role: role || "investor",
+          role: resolvedRole,
         });
 
-        if (profileError) throw profileError;
+        if (profileError) {
+          console.error("Profile insert error:", profileError);
+          throw new Error(`Failed to create profile: ${profileError.message}`);
+        }
 
-        // Handle role-specific data
-        if (role === "business" && additionalData) {
-          const { error: msmeError } = await supabase.from("msme_profiles").insert({
+        // Role-specific table inserts
+        if (resolvedRole === "business") {
+          const msmePayload = {
             user_id: userId,
-            business_name: additionalData.business_name,
-            gst_number: additionalData.gst_number,
-            sector: additionalData.sector,
-            city: additionalData.city,
-            founding_year: additionalData.founding_year,
-            funding_target: additionalData.funding_target,
-            equity_offered: additionalData.equity_offered,
-          });
-
-          if (msmeError) throw msmeError;
-        } else if (role === "investor" && additionalData) {
+            business_name: additionalData?.business_name ?? "",
+            gst_number: additionalData?.gst_number ?? "",
+            sector: additionalData?.sector ?? "",
+            city: additionalData?.city ?? "",
+            founding_year: additionalData?.founding_year ?? new Date().getFullYear(),
+            funding_target: additionalData?.funding_target ?? 0,
+            equity_offered: additionalData?.equity_offered ?? 0,
+          };
+          const { error: msmeError } = await supabase.from("msme_profiles").insert(msmePayload);
+          if (msmeError) {
+            console.error("MSME profile insert error:", msmeError);
+            throw new Error(`Failed to create business profile: ${msmeError.message}`);
+          }
+        } else if (resolvedRole === "investor") {
+          // Always create investor row — wallet_address is optional
           const { error: investorError } = await supabase.from("investors").insert({
             user_id: userId,
-            wallet_address: additionalData.wallet_address || null,
+            wallet_address: additionalData?.wallet_address || null,
           });
-
-          if (investorError) throw investorError;
+          if (investorError) {
+            console.error("Investor insert error:", investorError);
+            throw new Error(`Failed to create investor profile: ${investorError.message}`);
+          }
         }
 
         setUser({
           id: userId,
           name,
           email,
-          role,
+          role: resolvedRole,
         });
 
         setShowToast("Registration successful! Welcome to NeuroGrowth!", "success");

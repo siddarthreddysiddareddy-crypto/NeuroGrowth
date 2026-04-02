@@ -11,7 +11,6 @@ export default function BusinessLogin() {
   const router = useRouter();
   const { login, isLoading } = useAuth();
   const [formData, setFormData] = useState({
-    name: "",
     businessEmail: "",
     password: "",
   });
@@ -28,7 +27,6 @@ export default function BusinessLogin() {
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
-    if (!formData.name) newErrors.name = "Name is required";
     if (!formData.businessEmail) newErrors.businessEmail = "Email is required";
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.businessEmail))
       newErrors.businessEmail = "Please enter a valid email";
@@ -70,16 +68,6 @@ export default function BusinessLogin() {
         {/* Form Card */}
         <div className="bg-white rounded-2xl shadow-soft p-8 border border-gray-200">
           <form onSubmit={handleSubmit} className="space-y-4">
-            <Input
-              label="Name"
-              name="name"
-              type="text"
-              placeholder="John Doe"
-              value={formData.name}
-              onChange={handleChange}
-              error={errors.name}
-            />
-
             <Input
               label="Business Email"
               name="businessEmail"

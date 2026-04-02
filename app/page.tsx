@@ -1,12 +1,36 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/lib/supabaseClient";
 
 export default function Home() {
   const [selectedRole, setSelectedRole] = useState<"business" | "investor"| null>(null);
   const { isAuthenticated, user } = useAuth();
+
+  // Test Supabase connection on component mount
+  useEffect(() => {
+    const testSupabaseConnection = async () => {
+      try {
+        console.log("🔗 Testing Supabase connection...");
+        
+        // Get session to test connection
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error("❌ Supabase connection error:", error.message);
+        } else {
+          console.log("✅ Supabase connection successful");
+          console.log("📊 Current session:", session ? "User logged in" : "No user session");
+        }
+      } catch (error) {
+        console.error("❌ Failed to test Supabase:", error);
+      }
+    };
+
+    testSupabaseConnection();
+  }, []);
 
   // If authenticated, redirect to appropriate dashboard
   const dashboardLink = isAuthenticated

@@ -1,8 +1,8 @@
 "use client";
 
+import { motion } from "framer-motion";
 import Card from "@/components/Card";
 
-// Mock Data
 const weeklyContentPlan = [
   { day: "Monday", content: "Announce new product feature" },
   { day: "Tuesday", content: "Share customer success story" },
@@ -20,176 +20,221 @@ const aiCaptions = [
   },
   {
     title: "Caption Variation 2",
-    text:
-      "Excited to share how our customers are scaling faster than ever before. See real results in real time. 📊✨",
+    text: "Excited to share how our customers are scaling faster than ever before. See real results in real time. 📊✨",
   },
   {
     title: "Caption Variation 3",
-    text:
-      "Your business deserves to grow on autopilot. Discover the operating system that powers growth for 1000+ companies.",
+    text: "Your business deserves to grow on autopilot. Discover the operating system that powers growth for 1000+ companies.",
   },
 ];
 
 const campaignMetrics = [
-  { label: "Click-Through Rate", value: "8.4%", icon: "📍", trend: "+2.3%" },
-  { label: "Engagement Rate", value: "12.7%", icon: "💬", trend: "+4.1%" },
-  { label: "Reach", value: "24.5K", icon: "👥", trend: "+18%" },
-  { label: "Conversions", value: "342", icon: "✅", trend: "+12%" },
+  { label: "Click-Through Rate", value: "8.4%", icon: "📍", trend: "+2.3%", accent: "#60a5fa" },
+  { label: "Engagement Rate", value: "12.7%", icon: "💬", trend: "+4.1%", accent: "#a78bfa" },
+  { label: "Reach", value: "24.5K", icon: "👥", trend: "+18%", accent: "#34d399" },
+  { label: "Conversions", value: "342", icon: "✅", trend: "+12%", accent: "#fbbf24" },
 ];
 
 export default function DashboardPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary via-primary-light to-primary py-8 px-4">
+    <div className="min-h-screen p-8" style={{ background: "#080f1e" }}>
       <div className="max-w-7xl mx-auto">
-        {/* Dashboard Header */}
-        <div className="mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-2">
+        {/* Header */}
+        <div className="mb-10">
+          <h1 className="text-3xl font-extrabold text-white mb-1 tracking-tight">
             Marketing Dashboard
           </h1>
-          <p className="text-gray-300 text-lg">
-            Your AI-powered operating system for growth
-          </p>
+          <p className="text-white/40 text-sm">Your AI-powered operating system for growth</p>
         </div>
 
         {/* Metrics Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
           {campaignMetrics.map((metric, i) => (
-            <Card key={i} className="text-center">
-              <div className="text-4xl mb-3">{metric.icon}</div>
-              <h3 className="text-gray-400 text-sm mb-2">{metric.label}</h3>
-              <div className="flex items-baseline justify-center gap-2">
-                <p className="text-3xl font-bold text-white">{metric.value}</p>
-                <span className="text-green-400 text-sm font-semibold">
-                  {metric.trend}
-                </span>
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: i * 0.1, ease: "easeOut" }}
+              className="relative overflow-hidden rounded-2xl p-5 group transition-all duration-300 hover:scale-[1.02]"
+              style={{
+                background: "rgba(255,255,255,0.03)",
+                border: "1px solid rgba(255,255,255,0.07)",
+                backdropFilter: "blur(20px)",
+              }}
+            >
+              <div
+                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl pointer-events-none"
+                style={{ background: `radial-gradient(ellipse at top left, ${metric.accent}10 0%, transparent 60%)` }}
+              />
+              <div className="relative z-10 text-center">
+                <div className="text-4xl mb-3">{metric.icon}</div>
+                <p className="text-white/35 text-xs uppercase tracking-wide font-semibold mb-2">{metric.label}</p>
+                <div className="flex items-baseline justify-center gap-2">
+                  <p className="text-3xl font-extrabold text-white tabular-nums">{metric.value}</p>
+                  <span
+                    className="text-xs font-bold px-2 py-0.5 rounded-full"
+                    style={{ background: `${metric.accent}18`, color: metric.accent, border: `1px solid ${metric.accent}30` }}
+                  >
+                    {metric.trend}
+                  </span>
+                </div>
               </div>
-            </Card>
+            </motion.div>
           ))}
         </div>
 
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+        {/* Main Content */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
           {/* Weekly Content Plan */}
           <div className="lg:col-span-2">
             <Card title="📅 Weekly Content Plan">
-              <div className="space-y-3">
+              <div className="space-y-2">
                 {weeklyContentPlan.map((item, i) => (
                   <div
                     key={i}
-                    className="flex items-start gap-4 p-3 bg-primary/30 rounded-lg hover:bg-primary/50 transition-colors group cursor-pointer"
+                    className="flex items-center gap-4 p-3 rounded-xl cursor-pointer transition-all duration-200 hover:scale-[1.01] group"
+                    style={{
+                      background: "rgba(255,255,255,0.03)",
+                      border: "1px solid rgba(255,255,255,0.06)",
+                    }}
                   >
-                    <div className="flex items-center justify-center w-12 h-12 bg-blue-500/20 border border-blue-500/30 rounded-lg group-hover:bg-blue-500/30 transition-colors flex-shrink-0">
-                      <span className="text-lg font-bold text-blue-400">
-                        {i + 1}
-                      </span>
+                    <div
+                      className="flex items-center justify-center w-10 h-10 rounded-xl flex-shrink-0 text-sm font-bold transition-all group-hover:scale-110"
+                      style={{
+                        background: "rgba(59,130,246,0.12)",
+                        border: "1px solid rgba(59,130,246,0.22)",
+                        color: "#60a5fa",
+                      }}
+                    >
+                      {i + 1}
                     </div>
                     <div className="flex-1">
-                      <p className="font-semibold text-white">{item.day}</p>
-                      <p className="text-sm text-gray-400">{item.content}</p>
+                      <p className="text-white/85 font-semibold text-sm">{item.day}</p>
+                      <p className="text-white/35 text-xs mt-0.5">{item.content}</p>
                     </div>
-                    <span className="text-xl">✓</span>
+                    <span className="text-white/20 text-lg group-hover:text-white/50 transition-colors">✓</span>
                   </div>
                 ))}
               </div>
-
-              <button className="w-full mt-6 px-4 py-2 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/50 text-blue-300 rounded-lg transition-colors text-sm font-medium">
-                Generate Next Week's Plan
+              <button
+                className="w-full mt-5 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all hover:scale-[1.01]"
+                style={{
+                  background: "rgba(59,130,246,0.10)",
+                  border: "1px solid rgba(59,130,246,0.20)",
+                  color: "#60a5fa",
+                }}
+              >
+                Generate Next Week&apos;s Plan
               </button>
             </Card>
           </div>
 
           {/* Campaign Status */}
-          <div>
-            <Card title="🎯 Campaign Status">
-              <div className="space-y-4">
-                {[
-                  { name: "Spring Sale 2024", status: "Active", progress: 75 },
-                  {
-                    name: "Q2 Product Launch",
-                    status: "Planning",
-                    progress: 40,
-                  },
-                  { name: "Email Nurture", status: "Active", progress: 60 },
-                ].map((campaign, i) => (
-                  <div key={i}>
-                    <div className="flex justify-between items-center mb-2">
-                      <p className="font-medium text-white text-sm">
-                        {campaign.name}
-                      </p>
-                      <span
-                        className={`text-xs px-2 py-1 rounded-full font-semibold ${
-                          campaign.status === "Active"
-                            ? "bg-green-500/20 text-green-400"
-                            : "bg-yellow-500/20 text-yellow-400"
-                        }`}
-                      >
-                        {campaign.status}
-                      </span>
-                    </div>
-                    <div className="w-full bg-primary/40 rounded-full h-2">
-                      <div
-                        className="bg-gradient-to-r from-blue-400 to-blue-600 h-2 rounded-full transition-all"
-                        style={{ width: `${campaign.progress}%` }}
-                      ></div>
-                    </div>
-                    <p className="text-xs text-gray-500 mt-1">
-                      {campaign.progress}% complete
-                    </p>
+          <Card title="🎯 Campaign Status">
+            <div className="space-y-5">
+              {[
+                { name: "Spring Sale 2024", status: "Active", progress: 75 },
+                { name: "Q2 Product Launch", status: "Planning", progress: 40 },
+                { name: "Email Nurture", status: "Active", progress: 60 },
+              ].map((campaign, i) => (
+                <div key={i}>
+                  <div className="flex justify-between items-center mb-2">
+                    <p className="text-white/85 font-medium text-sm">{campaign.name}</p>
+                    <span
+                      className={`text-xs px-2.5 py-0.5 rounded-full font-semibold ${
+                        campaign.status === "Active"
+                          ? "bg-emerald-500/15 text-emerald-400"
+                          : "bg-yellow-500/15 text-yellow-400"
+                      }`}
+                    >
+                      {campaign.status}
+                    </span>
                   </div>
-                ))}
-              </div>
-
-              <button className="w-full mt-6 px-4 py-2 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/50 text-blue-300 rounded-lg transition-colors text-sm font-medium">
-                + New Campaign
-              </button>
-            </Card>
-          </div>
-        </div>
-
-        {/* AI Generated Captions */}
-        <Card title="✨ AI Generated Captions">
-          <div>
-            <p className="text-gray-400 text-sm mb-6">
-              Choose from these AI-generated caption variations for your next
-              post:
-            </p>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {aiCaptions.map((caption, i) => (
-                <div
-                  key={i}
-                  className="bg-primary/30 border border-blue-500/20 rounded-lg p-4 hover:bg-primary/50 hover:border-blue-500/40 transition-all group cursor-pointer"
-                >
-                  <p className="font-semibold text-blue-400 mb-3 text-sm">
-                    {caption.title}
-                  </p>
-                  <p className="text-gray-300 text-sm leading-relaxed mb-4">
-                    {caption.text}
-                  </p>
-                  <button className="w-full px-3 py-2 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/50 text-blue-300 rounded-lg transition-colors text-xs font-medium">
-                    Copy & Use
-                  </button>
+                  <div className="w-full rounded-full h-1.5 mb-1.5" style={{ background: "rgba(255,255,255,0.06)" }}>
+                    <div
+                      className="h-1.5 rounded-full transition-all"
+                      style={{
+                        width: `${campaign.progress}%`,
+                        background: "linear-gradient(90deg, #3b82f6, #6366f1)",
+                      }}
+                    />
+                  </div>
+                  <p className="text-white/25 text-xs">{campaign.progress}% complete</p>
                 </div>
               ))}
             </div>
-
-            <button className="w-full mt-6 px-4 py-3 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white rounded-lg transition-all font-semibold flex items-center justify-center gap-2">
-              🤖 Generate More Captions
+            <button
+              className="w-full mt-5 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all hover:scale-[1.01]"
+              style={{ background: "rgba(59,130,246,0.10)", border: "1px solid rgba(59,130,246,0.20)", color: "#60a5fa" }}
+            >
+              + New Campaign
             </button>
+          </Card>
+        </div>
+
+        {/* AI Captions */}
+        <Card title="✨ AI Generated Captions">
+          <p className="text-white/35 text-sm mb-5">
+            Choose from these AI-generated caption variations for your next post:
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {aiCaptions.map((caption, i) => (
+              <div
+                key={i}
+                className="rounded-xl p-4 cursor-pointer group transition-all duration-200 hover:scale-[1.02]"
+                style={{ background: "rgba(59,130,246,0.06)", border: "1px solid rgba(59,130,246,0.12)" }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLElement).style.background = "rgba(59,130,246,0.12)";
+                  (e.currentTarget as HTMLElement).style.borderColor = "rgba(59,130,246,0.25)";
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLElement).style.background = "rgba(59,130,246,0.06)";
+                  (e.currentTarget as HTMLElement).style.borderColor = "rgba(59,130,246,0.12)";
+                }}
+              >
+                <p className="font-bold text-blue-400 mb-2.5 text-xs uppercase tracking-wide">{caption.title}</p>
+                <p className="text-white/55 text-sm leading-relaxed mb-4">{caption.text}</p>
+                <button
+                  className="w-full px-3 py-2 rounded-lg text-xs font-semibold transition-all"
+                  style={{ background: "rgba(59,130,246,0.18)", border: "1px solid rgba(59,130,246,0.30)", color: "#60a5fa" }}
+                >
+                  Copy & Use
+                </button>
+              </div>
+            ))}
           </div>
+          <button
+            className="w-full mt-5 px-4 py-3 rounded-xl text-sm font-bold text-white transition-all hover:scale-[1.01] flex items-center justify-center gap-2"
+            style={{ background: "linear-gradient(135deg, #3b82f6, #6366f1)", boxShadow: "0 4px 20px rgba(59,130,246,0.3)" }}
+          >
+            🤖 Generate More Captions
+          </button>
         </Card>
 
         {/* Bottom CTA */}
-        <div className="mt-8 bg-gradient-to-r from-blue-600/20 to-blue-500/20 border border-blue-500/30 rounded-2xl p-8 text-center">
-          <h2 className="text-2xl font-bold text-white mb-2">
-            Ready to Scale Your Growth?
-          </h2>
-          <p className="text-gray-300 mb-6">
-            Connect your social accounts and let AI automate your marketing 24/7
-          </p>
-          <button className="btn-primary">
-            Connect Social Accounts →
-          </button>
+        <div
+          className="mt-6 rounded-2xl p-8 text-center relative overflow-hidden"
+          style={{
+            background: "rgba(59,130,246,0.06)",
+            border: "1px solid rgba(59,130,246,0.14)",
+          }}
+        >
+          <div
+            className="absolute inset-0 opacity-50 pointer-events-none"
+            style={{ background: "radial-gradient(ellipse at center, rgba(59,130,246,0.12) 0%, transparent 70%)" }}
+          />
+          <div className="relative z-10">
+            <h2 className="text-2xl font-extrabold text-white mb-2">Ready to Scale Your Growth?</h2>
+            <p className="text-white/40 mb-6 text-sm">
+              Connect your social accounts and let AI automate your marketing 24/7
+            </p>
+            <button
+              className="px-7 py-3 rounded-xl text-sm font-bold text-white transition-all hover:scale-105"
+              style={{ background: "linear-gradient(135deg, #3b82f6, #6366f1)", boxShadow: "0 4px 20px rgba(59,130,246,0.35)" }}
+            >
+              Connect Social Accounts →
+            </button>
+          </div>
         </div>
       </div>
     </div>

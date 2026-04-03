@@ -18,8 +18,8 @@ export default function Sidebar() {
     }
   }, []);
 
-  // Hide sidebar on auth pages and home
-  if (pathname.startsWith("/auth/") || pathname === "/") {
+  // Hide sidebar on auth pages, home, and onboard
+  if (pathname.startsWith("/auth/") || pathname === "/" || pathname.startsWith("/onboard")) {
     return null;
   }
 

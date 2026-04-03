@@ -63,18 +63,7 @@ export default function Navbar() {
               Home
             </Link>
 
-            {!isAuthenticated && (
-              <Link
-                href="/onboard"
-                className={`transition-colors ${
-                  pathname === "/onboard"
-                    ? "text-blue-400"
-                    : "text-gray-300 hover:text-white"
-                }`}
-              >
-                Get Started
-              </Link>
-            )}
+
 
             {/* Dashboard Link (Role-based) */}
             {isAuthenticated && userRole && (
@@ -140,7 +129,7 @@ export default function Navbar() {
                   Login
                 </Link>
                 <Link
-                  href="/"
+                  href="/onboard"
                   className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors text-sm font-medium"
                 >
                   Get Started

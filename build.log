@@ -1,0 +1,24 @@
+
+> neurogrowth@0.1.0 build
+> next build
+
+   ▲ Next.js 14.0.0
+   - Environments: .env.local
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully
+   Linting and checking validity of types ...
+Failed to compile.
+
+.next/types/app/api/dividends/route.ts:8:13
+Type error: Type 'OmitWithTag<typeof import("C:/Users/Ojas Bhayal/NeuroGrowth/app/api/dividends/route"), "POST" | "GET" | "HEAD" | "OPTIONS" | "PUT" | "DELETE" | "PATCH" | "config" | "generateStaticParams" | ... 6 more ... | "maxDuration", "">' does not satisfy the constraint '{ [x: string]: never; }'.
+  Property 'POSTBATCH' is incompatible with index signature.
+    Type '(req: Request) => Promise<NextResponse<{ error: string; }> | NextResponse<{ success: boolean; data: any[]; errors: { investor_id: string; error: string; }[] | undefined; total_distributed: any; count: number; }>>' is not assignable to type 'never'.
+
+[0m [90m  6 |[39m[0m
+[0m [90m  7 |[39m [90m// Check that the entry is a valid entry[39m[0m
+[0m[31m[1m>[22m[39m[90m  8 |[39m checkFields[33m<[39m[33mDiff[39m[33m<[39m{[0m
+[0m [90m    |[39m             [31m[1m^[22m[39m[0m
+[0m [90m  9 |[39m   [33mGET[39m[33m?[39m[33m:[39m [33mFunction[39m[0m
+[0m [90m 10 |[39m   [33mHEAD[39m[33m?[39m[33m:[39m [33mFunction[39m[0m
+[0m [90m 11 |[39m   [33mOPTIONS[39m[33m?[39m[33m:[39m [33mFunction[39m[0m

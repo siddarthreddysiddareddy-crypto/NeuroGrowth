@@ -1,311 +1,173 @@
-"use client";
+// Server Component — no "use client" directive
+// Hero text renders instantly from the server.
+// Dynamic stats are streamed via <Suspense> inside BentoGrid > StatsCard.
+import dynamic from "next/dynamic";
+import { Inter, Outfit } from "next/font/google";
+import type { Metadata } from "next";
+import { ViewProvider } from "@/components/landing/ViewToggle";
 
-import Link from "next/link";
-import { useState, useEffect } from "react";
-import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/lib/supabaseClient";
-import { usePlatformLiveStats } from "@/hooks/useLiveData";
+// Metadata (static, server-side)
+export const metadata: Metadata = {
+  title: "NeuroGrowth — AI Growth Intelligence Platform",
+  description:
+    "Connect investors with high-alpha opportunities and empower businesses with AI‑driven marketing automation, growth analytics, and intelligent deal flow.",
+  openGraph: {
+    title: "NeuroGrowth — AI Growth Intelligence Platform",
+    description: "AI-powered platform connecting businesses and investors for accelerated growth.",
+    type: "website",
+  },
+};
 
-export default function Home() {
-  const [selectedRole, setSelectedRole] = useState<"business" | "investor"| null>(null);
-  const { totalBusinesses, totalInvestors, totalDeals, totalFundingDisplay, activeUsers, isLive } = usePlatformLiveStats();
-  const { isAuthenticated, user } = useAuth();
+// Dynamically import heavy client components (no SSR for Three.js canvas)
+const ParticleField = dynamic(
+  () => import("@/components/landing/ParticleField"),
+  { ssr: false }
+);
 
-  // Test Supabase connection on component mount
-  useEffect(() => {
-    const testSupabaseConnection = async () => {
-      try {
-        console.log("🔗 Testing Supabase connection...");
-        
-        // Get session to test connection
-        const { data: { session }, error } = await supabase.auth.getSession();
-        
-        if (error) {
-          console.error("❌ Supabase connection error:", error.message);
-        } else {
-          console.log("✅ Supabase connection successful");
-          console.log("📊 Current session:", session ? "User logged in" : "No user session");
-        }
-      } catch (error) {
-        console.error("❌ Failed to test Supabase:", error);
-      }
-    };
+const ViewToggle = dynamic(
+  () => import("@/components/landing/ViewToggle"),
+  { ssr: false }
+);
 
-    testSupabaseConnection();
-  }, []);
+const BentoGrid = dynamic(
+  () => import("@/components/landing/BentoGrid"),
+  { ssr: false }
+);
 
-  // If authenticated, redirect to appropriate dashboard
-  const dashboardLink = isAuthenticated
-    ? user?.role === "business"
-      ? "/dashboard/business"
-      : "/dashboard/investor"
-    : null;
+const outfit = Outfit({ subsets: ["latin"], weight: ["400", "600", "700", "800"] });
 
+export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary via-primary-light to-primary">
-      {/* Hero Section */}
-      <section className="min-h-[calc(100vh-64px)] flex items-center justify-center px-4 py-20">
-        <div className="max-w-4xl mx-auto text-center">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-500/10 border border-blue-500/30 rounded-full mb-6 hover:bg-blue-500/20 transition-colors">
-            <span className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></span>
-            <span className="text-sm font-medium text-blue-300">
-              AI-Powered Growth Automation
-            </span>
-          </div>
+    <>
+      {/* ── Ambient background orbs (static, server-rendered) ── */}
+      <div aria-hidden="true" className="pointer-events-none select-none">
+        <div
+          className="ambient-orb"
+          style={{
+            width: 600,
+            height: 600,
+            top: "-15%",
+            left: "-10%",
+            background: "rgba(59,130,246,0.12)",
+            animationDelay: "0s",
+          }}
+        />
+        <div
+          className="ambient-orb"
+          style={{
+            width: 500,
+            height: 500,
+            bottom: "5%",
+            right: "-8%",
+            background: "rgba(139,92,246,0.10)",
+            animationDelay: "3s",
+          }}
+        />
+        <div
+          className="ambient-orb"
+          style={{
+            width: 400,
+            height: 400,
+            top: "40%",
+            left: "55%",
+            background: "rgba(16,185,129,0.07)",
+            animationDelay: "6s",
+          }}
+        />
+      </div>
 
-          {/* Live Platform Stats Bar */}
-          <div className="flex flex-wrap items-center justify-center gap-3 mb-8">
-            {/* Live indicator pill */}
-            <div className="flex items-center gap-2 px-3 py-1.5 bg-green-500/10 border border-green-500/30 rounded-full">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-              </span>
-              <span className="text-xs font-semibold text-green-400">{activeUsers} users online</span>
-            </div>
-            <div className="h-4 w-px bg-white/10 hidden sm:block" />
-            {[
-              { label: "Businesses", value: totalBusinesses.toLocaleString(), icon: "🏢" },
-              { label: "Investors", value: totalInvestors.toLocaleString(), icon: "💼" },
-              { label: "Deals Closed", value: totalDeals.toLocaleString(), icon: "🤝" },
-              { label: "Funding Raised", value: totalFundingDisplay, icon: "💰" },
-            ].map((stat, i) => (
-              <div key={i} className="flex items-center gap-1.5 px-3 py-1.5 bg-white/5 border border-white/10 rounded-full">
-                <span className="text-sm">{stat.icon}</span>
-                <span className="text-xs font-bold text-white tabular-nums">{stat.value}</span>
-                <span className="text-xs text-gray-500">{stat.label}</span>
-              </div>
-            ))}
-          </div>
+      {/* ── Three.js particle canvas (client island, no SSR) ── */}
+      <ParticleField />
 
-          {/* Main Title */}
-          <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
-            NeuroGrowth{" "}
-            <span className="bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">
-              Intelligence Platform
-            </span>
-          </h1>
-
-          {/* Subtitle */}
-          <p className="text-lg md:text-xl text-gray-300 mb-8 max-w-2xl mx-auto leading-relaxed">
-            Connect investors with growth opportunities and empower businesses with
-            AI-driven insights, marketing automation, and intelligent analytics. The
-            platform where growth meets opportunity.
-          </p>
-
-          {/* Features Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-12 max-w-2xl mx-auto">
-            {[
-              {
-                icon: "✨",
-                feature: "AI Content Generation",
-              },
-              {
-                icon: "📊",
-                feature: "Campaign Analytics",
-              },
-              {
-                icon: "🚀",
-                feature: "Growth Automation",
-              },
-            ].map((item, i) => (
-              <div
-                key={i}
-                className="flex items-center gap-3 px-4 py-3 bg-primary-light/30 border border-blue-500/20 rounded-lg hover:bg-primary-light/50 transition-colors"
-              >
-                <span className="text-2xl">{item.icon}</span>
-                <span className="text-sm font-medium text-gray-200">
-                  {item.feature}
-                </span>
-              </div>
-            ))}
-          </div>
-
-          {/* Role Selection or Dashboard Link */}
-          {isAuthenticated ? (
-            <Link
-              href={dashboardLink || "/"}
-              className="inline-block btn-primary text-lg px-8 py-4 font-semibold hover:scale-105"
-            >
-              Go to Your Dashboard
-            </Link>
-          ) : (
-            <>
-              {/* Role Toggle */}
-              <div className="flex justify-center gap-4 mb-8">
-                <button
-                  onClick={() => setSelectedRole("business")}
-                  className={`px-6 py-3 rounded-lg font-semibold transition-all ${
-                    selectedRole === "business"
-                      ? "bg-blue-600 text-white shadow-lg"
-                      : "bg-blue-600/20 text-blue-300 hover:bg-blue-600/30"
-                  }`}
-                >
-                  🏢 Continue as Business
-                </button>
-                <button
-                  onClick={() => setSelectedRole("investor")}
-                  className={`px-6 py-3 rounded-lg font-semibold transition-all ${
-                    selectedRole === "investor"
-                      ? "bg-emerald-600 text-white shadow-lg"
-                      : "bg-emerald-600/20 text-emerald-300 hover:bg-emerald-600/30"
-                  }`}
-                >
-                  💰 Continue as Investor
-                </button>
-              </div>
-
-              {/* CTA Buttons */}
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                {selectedRole === "business" ? (
-                  <>
-                    <Link
-                      href="/auth/business/register"
-                      className="btn-primary text-lg px-8 py-4 font-semibold hover:scale-105"
-                    >
-                      Register as Business
-                    </Link>
-                    <Link
-                      href="/auth/business/login"
-                      className="btn-secondary text-lg px-8 py-4 font-semibold"
-                    >
-                      Already have account? Login
-                    </Link>
-                  </>
-                ) : selectedRole === "investor" ? (
-                  <>
-                    <Link
-                      href="/auth/investor/register"
-                      className="btn-primary text-lg px-8 py-4 font-semibold hover:scale-105"
-                    >
-                      Register as Investor
-                    </Link>
-                    <Link
-                      href="/auth/investor/login"
-                      className="btn-secondary text-lg px-8 py-4 font-semibold"
-                    >
-                      Already have account? Login
-                    </Link>
-                  </>
-                ) : (
-                  <p className="text-gray-400 text-sm">
-                    Select your role above to get started ↑
-                  </p>
-                )}
-              </div>
-            </>
-          )}
-
-          {/* Trust Badges */}
-          <div className="mt-16 pt-8 border-t border-primary-light/20">
-            <p className="text-sm text-gray-400 mb-4">
-              Trusted by growth teams at:
-            </p>
-            <div className="flex items-center justify-center gap-8 flex-wrap opacity-60">
-              {["TechStart", "GrowthHub", "ScaleUp", "StartupX"].map(
-                (name, i) => (
-                  <span
-                    key={i}
-                    className="text-gray-400 font-semibold text-sm"
-                  >
-                    {name}
-                  </span>
-                )
-              )}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section className="py-20 px-4 bg-primary-light/30 border-t border-primary-light/20">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl font-bold text-white mb-12 text-center">
-            Why Choose NeuroGrowth?
-          </h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-            <div>
-              <h3 className="text-2xl font-bold text-blue-400 mb-6">For Businesses</h3>
-              <div className="space-y-4">
-                {[
-                  {
-                    title: "AI Marketing Automation",
-                    description: "Generate content, manage campaigns, and automate workflows",
-                  },
-                  {
-                    title: "Growth Analytics",
-                    description: "Real-time insights on performance and engagement metrics",
-                  },
-                  {
-                    title: "Smart Scaling",
-                    description: "Grow faster with AI-powered recommendations and automation",
-                  },
-                ].map((feature, i) => (
-                  <div
-                    key={i}
-                    className="bg-card/50 backdrop-blur-sm border border-primary-light/20 rounded-xl p-6 hover:bg-card/70 transition-colors group"
-                  >
-                    <h4 className="text-lg font-semibold text-white mb-2 group-hover:text-blue-400 transition-colors">
-                      {feature.title}
-                    </h4>
-                    <p className="text-gray-400 leading-relaxed">{feature.description}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <h3 className="text-2xl font-bold text-green-400 mb-6">For Investors</h3>
-              <div className="space-y-4">
-                {[
-                  {
-                    title: "Deal Pipeline",
-                    description: "Access pre-screened, high-potential growth opportunities",
-                  },
-                  {
-                    title: "Performance Tracking",
-                    description: "Real-time portfolio metrics and investment performance analytics",
-                  },
-                  {
-                    title: "Opportunity Insights",
-                    description: "AI-driven market analysis and investment recommendations",
-                  },
-                ].map((feature, i) => (
-                  <div
-                    key={i}
-                    className="bg-card/50 backdrop-blur-sm border border-primary-light/20 rounded-xl p-6 hover:bg-card/70 transition-colors group"
-                  >
-                    <h4 className="text-lg font-semibold text-white mb-2 group-hover:text-green-400 transition-colors">
-                      {feature.title}
-                    </h4>
-                    <p className="text-gray-400 leading-relaxed">{feature.description}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-20 px-4">
-        <div className="max-w-3xl mx-auto bg-gradient-to-r from-blue-600/20 to-blue-500/20 border border-blue-500/30 rounded-2xl p-12 text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">
-            Ready to Transform Your Marketing?
-          </h2>
-          <p className="text-gray-300 mb-8">
-            Join hundreds of growing businesses using AI to scale faster.
-          </p>
-          <Link
-            href="/onboard"
-            className="btn-primary text-lg px-8 py-4 inline-block"
+      {/* ── Main content ── */}
+      <main
+        className={`relative z-10 min-h-screen flex flex-col ${outfit.className}`}
+        style={{ paddingTop: "80px" }} // below Navbar
+      >
+        {/* ── Stats bar — server rendered, instant ── */}
+        <div className="flex items-center justify-center py-5 px-4">
+          <div
+            className="flex flex-wrap items-center justify-center gap-2 px-4 py-2 rounded-full"
+            style={{
+              background: "rgba(255,255,255,0.03)",
+              border: "1px solid rgba(255,255,255,0.07)",
+            }}
           >
-            Get Started Free →
-          </Link>
+            {/* Live pulse */}
+            <div className="flex items-center gap-1.5">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-60" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500" />
+              </span>
+              <span className="text-xs font-semibold text-green-400">Platform is live</span>
+            </div>
+            <div className="hidden sm:block w-px h-3 bg-white/10" />
+            <span className="text-xs text-white/35 hidden sm:block">
+              Real-time data updates every 4 seconds
+            </span>
+            <div className="hidden sm:block w-px h-3 bg-white/10" />
+            <span className="text-xs font-medium text-white/40">
+              Powered by NeuroGrowth Intelligence
+            </span>
+          </div>
         </div>
-      </section>
-    </div>
+
+        {/* ── View Toggle ── */}
+        <ViewProvider>
+          <div className="flex flex-col items-center gap-10 pb-16">
+            {/* Toggle pill — client interactive */}
+            <div className="flex items-center justify-center px-4">
+              <ViewToggle />
+            </div>
+
+            {/* ── Bento Grid (client, with Suspense inside) ── */}
+            <BentoGrid />
+
+            {/* ── Trusted badge row (server-rendered static content) ── */}
+            <div className="flex flex-col items-center gap-4 px-4 mt-4">
+              <p className="text-xs text-white/25 uppercase tracking-widest font-semibold">
+                Built on trusted infrastructure
+              </p>
+              <div className="flex flex-wrap items-center justify-center gap-6 opacity-40">
+                {[
+                  { label: "Next.js 14", icon: "▲" },
+                  { label: "Supabase", icon: "⚡" },
+                  { label: "OpenAI GPT-4o", icon: "🧠" },
+                  { label: "Ethereum", icon: "◆" },
+                  { label: "Vercel Edge", icon: "⬡" },
+                ].map((t) => (
+                  <div key={t.label} className="flex items-center gap-1.5">
+                    <span className="text-white/50 text-sm">{t.icon}</span>
+                    <span className="text-xs font-semibold text-white/40">{t.label}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </ViewProvider>
+      </main>
+
+      {/* ── Footer ── */}
+      <footer
+        className="relative z-10 py-8 px-4 flex flex-col items-center gap-3"
+        style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}
+      >
+        <p className="text-xs text-white/25">
+          © {new Date().getFullYear()} NeuroGrowth Intelligence Ltd. · All rights reserved.
+        </p>
+        <div className="flex items-center gap-4">
+          {["Privacy", "Terms", "Security", "Contact"].map((link) => (
+            <a
+              key={link}
+              href="#"
+              className="text-xs text-white/25 hover:text-white/50 transition-colors"
+            >
+              {link}
+            </a>
+          ))}
+        </div>
+      </footer>
+    </>
   );
 }
+

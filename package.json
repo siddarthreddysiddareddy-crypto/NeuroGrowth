@@ -9,11 +9,16 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@react-three/drei": "^9.105.6",
+    "@react-three/fiber": "^8.16.8",
     "@supabase/supabase-js": "^2.101.1",
+    "@types/three": "^0.183.1",
     "ethers": "^6.16.0",
+    "framer-motion": "^12.38.0",
     "next": "14.0.0",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "three": "^0.164.0"
   },
   "devDependencies": {
     "@types/node": "^20",

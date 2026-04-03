@@ -2,39 +2,57 @@
 
 import Card from "@/components/Card";
 import ChatBox from "@/components/ChatBox";
-import { Campaign } from "@/types/database";
-
-const campaignMetrics = [
-  { label: "Engagement Rate", value: "12.7%", icon: "💬", trend: "+4.1%" },
-  { label: "Reach", value: "24.5K", icon: "👥", trend: "+18%" },
-  { label: "Conversions", value: "342", icon: "✅", trend: "+12%" },
-];
-
-const activeCampaigns: Campaign[] = [
-  { id: "c1", businessId: "b1", name: "Spring Sale 2024", status: "Active", progress: 75, roiDisplay: "₹15,42,000", createdAt: new Date().toISOString() },
-  { id: "c2", businessId: "b1", name: "Q2 Product Launch", status: "Planning", progress: 40, roiDisplay: "TBD", createdAt: new Date().toISOString() },
-  { id: "c3", businessId: "b1", name: "Email Nurture Sequence", status: "Active", progress: 60, roiDisplay: "₹8,95,000", createdAt: new Date().toISOString() },
-];
+import LiveActivityFeed from "@/components/LiveActivityFeed";
+import { useBusinessLiveData } from "@/hooks/useLiveData";
 
 export default function MainDashboard() {
+  const {
+    engagementRate,
+    reach,
+    conversions,
+    campaigns,
+    activities,
+    lastUpdated,
+  } = useBusinessLiveData();
+
+  const campaignMetrics = [
+    { label: "Engagement Rate", value: `${engagementRate.toFixed(1)}%`, icon: "💬", trend: "+4.1%" },
+    { label: "Reach", value: reach >= 1000 ? `${(reach / 1000).toFixed(1)}K` : `${reach}`, icon: "👥", trend: "+18%" },
+    { label: "Conversions", value: `${conversions}`, icon: "✅", trend: "+12%" },
+  ];
+
   return (
     <div className="p-8">
       {/* Dashboard Header */}
-      <div className="mb-12">
-        <h1 className="text-4xl font-bold text-white mb-2">Business Dashboard</h1>
-        <p className="text-gray-300 text-lg">
-          Marketing automation, analytics, and growth tools
-        </p>
+      <div className="mb-10 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+        <div>
+          <h1 className="text-4xl font-bold text-white mb-2">Business Dashboard</h1>
+          <p className="text-gray-300 text-lg">
+            Marketing automation, analytics, and growth tools
+          </p>
+        </div>
+        {/* Live Indicator */}
+        <div className="flex items-center gap-3 bg-green-500/10 border border-green-500/30 px-4 py-2.5 rounded-xl text-sm">
+          <span className="relative flex h-2.5 w-2.5">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500"></span>
+          </span>
+          <span className="text-green-300 font-semibold">LIVE</span>
+          <span className="text-gray-400 text-xs">Updated {lastUpdated}</span>
+        </div>
       </div>
 
       {/* Metrics Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
         {campaignMetrics.map((metric, i) => (
-          <Card key={i} className="text-center">
+          <Card key={i} className="text-center relative overflow-hidden group">
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
             <div className="text-4xl mb-3">{metric.icon}</div>
             <h3 className="text-gray-400 text-sm mb-2">{metric.label}</h3>
             <div className="flex items-baseline justify-center gap-2">
-              <p className="text-3xl font-bold text-white">{metric.value}</p>
+              <p className="text-3xl font-bold text-white tabular-nums transition-all duration-500">
+                {metric.value}
+              </p>
               <span className="text-green-400 text-sm font-semibold">{metric.trend}</span>
             </div>
           </Card>
@@ -44,13 +62,25 @@ export default function MainDashboard() {
       {/* Campaign ROI */}
       <div className="mb-8">
         <Card title="💰 Campaign ROI">
-          <div className="space-y-4">
-            {activeCampaigns.map((campaign, i) => (
-              <div key={i}>
+          <div className="flex items-center gap-2 mb-4">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+            </span>
+            <span className="text-xs text-blue-400 font-medium">Live campaign data</span>
+          </div>
+          <div className="space-y-5">
+            {campaigns.map((campaign, i) => (
+              <div key={campaign.id}>
                 <div className="flex justify-between items-center mb-2">
-                  <p className="font-medium text-white text-sm">
-                    {campaign.name}
-                  </p>
+                  <div>
+                    <p className="font-medium text-white text-sm">{campaign.name}</p>
+                    {campaign.status === "Active" && (
+                      <p className="text-xs text-gray-500 mt-0.5">
+                        Reach: {campaign.reach >= 1000 ? `${(campaign.reach / 1000).toFixed(1)}K` : campaign.reach} · Eng: {campaign.engagementRate.toFixed(1)}%
+                      </p>
+                    )}
+                  </div>
                   <span
                     className={`text-xs px-2 py-1 rounded-full font-semibold ${
                       campaign.status === "Active"
@@ -63,27 +93,26 @@ export default function MainDashboard() {
                 </div>
                 <div className="w-full bg-white/10 rounded-full h-2 mb-2">
                   <div
-                    className="bg-gradient-to-r from-blue-400 to-blue-600 h-2 rounded-full transition-all"
+                    className="bg-gradient-to-r from-blue-400 to-blue-600 h-2 rounded-full transition-all duration-1000"
                     style={{ width: `${campaign.progress}%` }}
-                  ></div>
+                  />
                 </div>
                 <div className="flex justify-between text-xs text-gray-400">
-                  <span>{campaign.progress}% complete</span>
-                  <span className="text-green-400 font-semibold">
+                  <span>{campaign.progress.toFixed(1)}% complete</span>
+                  <span className="text-green-400 font-semibold tabular-nums">
                     ROI: {campaign.roiDisplay}
                   </span>
                 </div>
               </div>
             ))}
           </div>
-
           <button className="w-full mt-6 px-4 py-2 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/50 text-blue-300 rounded-lg transition-colors text-sm font-medium">
             + New Campaign
           </button>
         </Card>
       </div>
 
-      {/* AI Agent & Insights */}
+      {/* AI Agent & Insights + Live Feed */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
         {/* AI Advisor */}
         <div className="lg:col-span-2 h-96">
@@ -114,6 +143,11 @@ export default function MainDashboard() {
             </div>
           </div>
         </Card>
+      </div>
+
+      {/* Live Activity Feed */}
+      <div>
+        <LiveActivityFeed activities={activities} title="⚡ Platform Activity Feed" />
       </div>
     </div>
   );

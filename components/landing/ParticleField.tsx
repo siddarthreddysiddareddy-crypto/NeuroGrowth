@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect, Suspense } from "react";
+import { useRef, useEffect, Suspense, memo } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 
@@ -12,7 +12,7 @@ interface ParticlesProps {
   count?: number;
 }
 
-function Particles({ count = 160 }: ParticlesProps) {
+const Particles = memo(function Particles({ count = 160 }: ParticlesProps) {
   const meshRef = useRef<THREE.Points>(null);
   const { size } = useThree();
 
@@ -102,10 +102,10 @@ function Particles({ count = 160 }: ParticlesProps) {
       />
     </points>
   );
-}
+});
 
 // ─── Connection lines ─────────────────────────────────────────────────────────
-function Connections() {
+const Connections = memo(function Connections() {
   const lineRef = useRef<THREE.LineSegments>(null);
 
   useFrame(({ clock }) => {
@@ -155,10 +155,10 @@ function Connections() {
       />
     </lineSegments>
   );
-}
+});
 
 // ─── Main export ─────────────────────────────────────────────────────────────
-export default function ParticleField() {
+export default memo(function ParticleField() {
   // Track mouse in plain ref — no React state, no re-renders
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -192,4 +192,4 @@ export default function ParticleField() {
       </Canvas>
     </div>
   );
-}
+});

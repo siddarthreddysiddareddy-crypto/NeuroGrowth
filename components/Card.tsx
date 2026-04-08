@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo } from "react";
 
 interface CardProps {
   title?: string;
@@ -7,7 +7,7 @@ interface CardProps {
   accentColor?: "blue" | "emerald" | "purple" | "none";
 }
 
-export default function Card({
+const Card = memo(function Card({
   title,
   children,
   className = "",
@@ -39,4 +39,6 @@ export default function Card({
       <div className="relative z-10">{children}</div>
     </div>
   );
-}
+});
+
+export default Card;
